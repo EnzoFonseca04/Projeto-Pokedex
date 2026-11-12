@@ -1,0 +1,28 @@
+{
+  "name": "PokéTeam Dev Container (Haskell + Node.js)",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/haskell:1": {
+      "version": "latest",
+      "installGhc": true,
+      "installCabal": true,
+      "installStack": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "haskell.haskell",
+        "justusadam.language-haskell",
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [8080, 5173],
+  "postCreateCommand": "cd backend && cabal update"
+}
