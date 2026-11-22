@@ -177,53 +177,64 @@ export default function App() {
         {/* Main Container */}
         <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-4 sm:space-y-5">
           
-          {/* Painel 1: Banner com Informações da Região (Estilo GBA Emerald / Frontier Pass) */}
+          {/* Painel 1: Banner com Informações da Região — Estilo Caixa de Diálogo Pokémon Emerald */}
           <div
-            className="relative rounded-lg overflow-hidden p-4 sm:p-6 border-4 border-[#0c2420] bg-[#142e28] shadow-[0_8px_30px_rgba(0,0,0,0.7),inset_0_2px_0_#488878,inset_0_-2px_0_#0a1814]"
+            className="relative overflow-hidden p-4 sm:p-5"
             style={{
-              backgroundImage: 'repeating-linear-gradient(to bottom, #183832 0px, #183832 3px, #122c26 3px, #122c26 6px)',
+              background: '#f0f4e8',
+              border: '4px solid #182028',
+              boxShadow: 'inset 0 0 0 3px #f0f4e8, inset 0 0 0 5px #182028, 0 6px 20px rgba(0,0,0,0.6)',
+              borderRadius: 0,
             }}
           >
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-[#0c1c18] border border-[#20483e] text-[#a4e0d4] text-[9px] sm:text-[10px] font-black mb-2 shadow-inner">
-                  <Swords className="w-3.5 h-3.5 text-[#38b878]" />
-                  <span>CAMPO DE BATALHA POKÉMON • GBA EMERALD & FIRE RED</span>
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 border-2 border-[#182028] text-[#182028] text-[9px] sm:text-[10px] font-black mb-2"
+                  style={{ background: '#d8e8d0', borderRadius: 0 }}>
+                  <Swords className="w-3.5 h-3.5 text-[#182028]" />
+                  <span>CAMPO DE BATALHA POKÉMON • GAME BOY ADVANCE</span>
                 </div>
-                <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight uppercase">
+                <h2 className="text-lg sm:text-2xl font-black tracking-tight uppercase text-[#182028]">
                   {activeGen ? (
                     <>
-                      REGIÃO DE <span className="text-[#f8d030]">{activeGen.region}</span>
+                      REGIÃO DE <span className="text-[#c82018]">{activeGen.region}</span>
                     </>
                   ) : (
                     'TODAS AS GERAÇÕES (I A V)'
                   )}
                 </h2>
-                <p className="text-[9px] sm:text-[11px] text-[#c8e8dc] mt-1.5 max-w-xl leading-relaxed font-bold">
+                <p className="text-[9px] sm:text-[11px] text-[#304850] mt-1.5 max-w-xl leading-relaxed font-bold">
                   {activeGen
                     ? `${activeGen.name.toUpperCase()} (${activeGen.games}) • POKÉMON #${String(activeGen.startId).padStart(3, '0')} A #${String(activeGen.endId).padStart(3, '0')}. Sprites 2D animados em movimento real. Clique no Pokémon para abrir o status GBA!`
                     : 'Catálogo oficial de Pokémon com sprites 2D animados em movimento real da 1ª à 5ª Geração (Kanto a Unova).'}
                 </p>
               </div>
 
-              {/* Controles da Direita: Contador e o Botão Team Builder com o visual exato da imagem enviada */}
+              {/* Controles da Direita */}
               <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-                <div className="p-2 sm:p-2.5 rounded-sm bg-[#0a1814] border-2 border-[#20483e] text-center min-w-[85px] sm:min-w-[95px] shadow-inner">
-                  <span className="text-[8px] sm:text-[9px] font-black text-[#48b878] uppercase tracking-wider block">
+                <div
+                  className="p-2 sm:p-2.5 text-center min-w-[85px] sm:min-w-[95px]"
+                  style={{
+                    background: '#d8e8d0',
+                    border: '3px solid #182028',
+                    boxShadow: 'inset 0 0 0 1px #d8e8d0, inset 0 0 0 2px #182028',
+                    borderRadius: 0,
+                  }}
+                >
+                  <span className="text-[8px] sm:text-[9px] font-black text-[#182028] uppercase tracking-wider block">
                     NO CAMPO
                   </span>
-                  <span className="text-base sm:text-xl font-black text-white font-mono">
+                  <span className="text-base sm:text-xl font-black text-[#182028] font-mono">
                     {filteredPokemon.length}
                   </span>
                 </div>
 
-                {/* BOTÃO TEAM BUILDER: Pílula Vermelha + Contador Oval Dourado estilo GBA (igual à imagem) */}
+                {/* BOTÃO TEAM BUILDER */}
                 <button
                   onClick={() => setIsTeamDrawerOpen(true)}
                   title="Abrir Team Builder"
                   className="relative inline-flex items-center gap-0 cursor-pointer active:scale-95 transition-all group select-none shrink-0"
                 >
-                  {/* Contador Oval Escuro com borda dourada — fica sobreposto à esquerda da pílula */}
                   <span
                     className="relative z-10 flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#101828] border-[3px] border-[#f8c820] shadow-[0_0_6px_#f8c820aa] mr-[-10px]"
                   >
@@ -232,8 +243,6 @@ export default function App() {
                     </span>
                     <span className="mt-0.5 text-[7px] leading-none" title="Pokéball">🔴</span>
                   </span>
-
-                  {/* Pílula principal vermelha */}
                   <span
                     className="inline-flex items-center pl-5 pr-4 py-2 sm:py-2.5 rounded-full font-black text-white text-[10px] sm:text-xs tracking-wide drop-shadow-sm"
                     style={{
@@ -249,11 +258,14 @@ export default function App() {
             </div>
           </div>
 
-          {/* Painel 2: Abas de Gerações (Estilo Painel GBA) */}
+          {/* Painel 2: Abas de Gerações — Estilo Caixa de Diálogo Pokémon Emerald */}
           <section
-            className="rounded-lg p-3 sm:p-4 border-4 border-[#0c2420] bg-[#142e28] shadow-[0_6px_25px_rgba(0,0,0,0.6)]"
+            className="p-3 sm:p-4"
             style={{
-              backgroundImage: 'repeating-linear-gradient(to bottom, #183832 0px, #183832 3px, #122c26 3px, #122c26 6px)',
+              background: '#f0f4e8',
+              border: '4px solid #182028',
+              boxShadow: 'inset 0 0 0 3px #f0f4e8, inset 0 0 0 5px #182028, 0 4px 16px rgba(0,0,0,0.5)',
+              borderRadius: 0,
             }}
           >
             <GenerationTabs
@@ -262,11 +274,14 @@ export default function App() {
             />
           </section>
 
-          {/* Painel 3: Filtros por Tipo e Ordenação (Estilo Painel GBA) */}
+          {/* Painel 3: Filtros por Tipo e Ordenação — Estilo Caixa de Diálogo Pokémon Emerald */}
           <section
-            className="rounded-lg p-3 sm:p-4 border-4 border-[#0c2420] bg-[#142e28] shadow-[0_6px_25px_rgba(0,0,0,0.6)] space-y-3"
+            className="p-3 sm:p-4 space-y-3"
             style={{
-              backgroundImage: 'repeating-linear-gradient(to bottom, #183832 0px, #183832 3px, #122c26 3px, #122c26 6px)',
+              background: '#f0f4e8',
+              border: '4px solid #182028',
+              boxShadow: 'inset 0 0 0 3px #f0f4e8, inset 0 0 0 5px #182028, 0 4px 16px rgba(0,0,0,0.5)',
+              borderRadius: 0,
             }}
           >
             <TypeFilters
@@ -274,21 +289,28 @@ export default function App() {
               onSelectType={setSelectedType}
             />
 
-            {/* Barra de Ordenação Retrô GBA */}
-            <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 pt-2.5 border-t-2 border-[#20483e] text-[9px] sm:text-[10px] font-black">
-              <span className="text-[#a0d0c4]">
-                MOSTRANDO <strong className="text-[#f8d030]">{visiblePokemon.length}</strong> DE <strong className="text-white">{filteredPokemon.length}</strong> POKÉMON
+            {/* Barra de Ordenação */}
+            <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 pt-2.5 text-[9px] sm:text-[10px] font-black"
+              style={{ borderTop: '2px solid #182028' }}>
+              <span className="text-[#304850]">
+                MOSTRANDO <strong className="text-[#c82018]">{visiblePokemon.length}</strong> DE <strong className="text-[#182028]">{filteredPokemon.length}</strong> POKÉMON
               </span>
 
               <div className="flex items-center gap-1.5">
-                <span className="text-[#a0d0c4] flex items-center gap-1">
-                  <ArrowUpDown className="w-3 h-3 text-[#f8d030]" />
+                <span className="text-[#304850] flex items-center gap-1">
+                  <ArrowUpDown className="w-3 h-3 text-[#c82018]" />
                   ORDENAR:
                 </span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-[#0c1c18] border-2 border-[#20483e] rounded-sm px-2 py-1 text-[9px] sm:text-[10px] text-white font-black focus:outline-none focus:border-[#f8d030] cursor-pointer"
+                  className="border-2 px-2 py-1 text-[9px] sm:text-[10px] font-black focus:outline-none cursor-pointer"
+                  style={{
+                    background: '#d8e8d0',
+                    borderColor: '#182028',
+                    color: '#182028',
+                    borderRadius: 0,
+                  }}
                 >
                   <option value="id_asc">NÚMERO (CRESCENTE)</option>
                   <option value="id_desc">NÚMERO (DECRESCENTE)</option>
