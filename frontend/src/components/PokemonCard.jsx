@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { POKEMON_TYPES } from '../data/types';
-import { formatPokemonId, capitalize, getSpriteUrl } from '../services/pokeApi';
-import { Plus, Check, GripVertical, Sparkles } from 'lucide-react';
+import {
+  formatPokemonId,
+  capitalize,
+  get2DAnimatedSpriteUrl,
+  getShowdownAnimatedSpriteUrl,
+  getFallbackSpriteUrl,
+  getCryAudioUrl,
+} from '../services/pokeApi';
+import { Plus, Check, GripVertical, Sparkles, Volume2 } from 'lucide-react';
 import { useTeam } from '../context/TeamContext';
 
 export default function PokemonCard({
@@ -11,25 +18,33 @@ export default function PokemonCard({
 }) {
   const { addToTeam, isPokemonInTeam } = useTeam();
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
+  const [fallbackLevel, setFallbackLevel] = useState(0);
 
   const inTeam = isPokemonInTeam(pokemon.id);
   const primaryType = pokemon.types?.[0] || 'normal';
   const typeConfig = POKEMON_TYPES[primaryType] || POKEMON_TYPES.normal;
 
+  // Sound cry helper
+  const handlePlayCry = (e) => {
+    e.stopPropagation();
+    try {
+      const audio = new Audio(getCryAudioUrl(pokemon.id));
+      audio.volume = 0.45;
+      audio.play().catch(() => {});
+    } catch (err) {}
+  };
+
   const handleDragStart = (e) => {
-    // Pack essential data for drag & drop
     const dragData = {
       id: pokemon.id,
       name: pokemon.name,
       types: pokemon.types,
-      sprite: getSpriteUrl(pokemon.id, { shiny: shinyMode }),
+      sprite: get2DAnimatedSpriteUrl(pokemon.id, shinyMode),
       stats: pokemon.stats,
     };
     e.dataTransfer.setData('application/json', JSON.stringify(dragData));
     e.dataTransfer.effectAllowed = 'copyMove';
 
-    // Visual drag feedback
     if (e.target) {
       e.target.style.opacity = '0.6';
     }
@@ -46,116 +61,159 @@ export default function PokemonCard({
     if (inTeam) return;
     addToTeam({
       ...pokemon,
-      sprite: getSpriteUrl(pokemon.id, { shiny: shinyMode }),
+      sprite: get2DAnimatedSpriteUrl(pokemon.id, shinyMode),
     });
   };
 
-  const spriteSrc = imageError
-    ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyMode ? 'shiny/' : ''}${pokemon.id}.png`
-    : getSpriteUrl(pokemon.id, { shiny: shinyMode });
+  const handleClickCard = () => {
+    // Toca o som oficial (Cry) e abre os status como na Pokédex
+    try {
+      const audio = new Audio(getCryAudioUrl(pokemon.id));
+      audio.volume = 0.45;
+      audio.play().catch(() => {});
+    } catch (err) {}
+
+    onClick();
+  };
+
+  // Sprites 2D animados com fallbacks elegantes
+  const getSpriteSource = () => {
+    if (fallbackLevel === 0) {
+      // 1. Sprite oficial animado 2D em pixel art (Geração V Black/White)
+      return get2DAnimatedSpriteUrl(pokemon.id, shinyMode);
+    }
+    if (fallbackLevel === 1) {
+      // 2. Sprite animado 2D Showdown
+      return getShowdownAnimatedSpriteUrl(pokemon.id, shinyMode);
+    }
+    // 3. Fallback estático pixel art
+    return getFallbackSpriteUrl(pokemon.id, shinyMode);
+  };
+
+  const handleImageError = () => {
+    if (fallbackLevel < 2) {
+      setFallbackLevel((prev) => prev + 1);
+    }
+  };
 
   return (
     <div
       draggable={true}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      onClick={onClick}
+      onClick={handleClickCard}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          onClick();
+          handleClickCard();
         }
       }}
-      className="group relative rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-slate-800 hover:border-slate-600 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl overflow-hidden cursor-pointer select-none"
+      className="group relative rounded-2xl bg-white/95 dark:bg-[#1a2e29] border-2 transition-all duration-200 hover:-translate-y-2 hover:shadow-2xl overflow-hidden cursor-pointer select-none flex flex-col justify-between"
       style={{
-        boxShadow: `0 10px 30px -15px ${typeConfig.color}25`,
+        borderColor: typeConfig.cardBorder || '#d8e4c8',
+        boxShadow: `0 8px 24px -10px ${typeConfig.color}40`,
       }}
     >
-      {/* Dynamic Type Glow Background */}
+      {/* Área Superior: Sprite 2D Animado sobre a Base de Batalha (Estilo Campo GBA) */}
       <div
-        className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20 blur-2xl group-hover:opacity-40 transition-opacity pointer-events-none"
-        style={{ backgroundColor: typeConfig.color }}
-      />
-
-      {/* Watermark Pokeball background in card */}
-      <div className="absolute top-2 right-2 text-slate-800/40 pointer-events-none group-hover:text-slate-700/60 transition-colors">
-        <svg className="w-24 h-24 -mr-6 -mt-6 opacity-20" viewBox="0 0 100 100" fill="currentColor">
-          <path d="M 50 10 A 40 40 0 0 0 12 46 L 36 46 A 14 14 0 0 1 50 36 A 14 14 0 0 1 64 46 L 88 46 A 40 40 0 0 0 50 10 Z M 12 54 A 40 40 0 0 0 50 90 A 40 40 0 0 0 88 54 L 64 54 A 14 14 0 0 1 50 64 A 14 14 0 0 1 36 54 L 12 54 Z" />
-          <circle cx="50" cy="50" r="8" />
-        </svg>
-      </div>
-
-      {/* Top Bar: ID and Drag Handle */}
-      <div className="relative p-3.5 pb-0 flex items-center justify-between z-10">
-        <div className="flex items-center gap-1.5">
-          <span className="font-mono text-xs font-bold text-slate-400 group-hover:text-slate-200 transition-colors">
-            {formatPokemonId(pokemon.id)}
-          </span>
-          {shinyMode && (
-            <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
-          )}
-        </div>
-
-        {/* Drag indicator & quick add button */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={handleQuickAdd}
-            disabled={inTeam}
-            title={inTeam ? 'Já está no time' : 'Adicionar ao time (+)'}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all ${
-              inTeam
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                : 'bg-slate-800/80 hover:bg-red-600 text-slate-300 hover:text-white border border-slate-700 hover:border-red-500'
-            }`}
-          >
-            {inTeam ? (
-              <>
-                <Check className="w-3 h-3" />
-                <span className="hidden sm:inline">No Time</span>
-              </>
-            ) : (
-              <>
-                <Plus className="w-3 h-3" />
-                <span>Time</span>
-              </>
+        className="relative h-44 w-full flex flex-col items-center justify-center p-3 rounded-t-2xl transition-colors overflow-hidden"
+        style={{
+          backgroundColor: typeConfig.cardBg || '#d7f7e6',
+        }}
+      >
+        {/* Controles do Card (Som, Shiny, Time, Drag) */}
+        <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono text-[10px] font-extrabold text-slate-700/80 dark:text-slate-900 bg-white/60 dark:bg-white/80 px-2 py-0.5 rounded-md border border-black/10 shadow-sm">
+              {formatPokemonId(pokemon.id)}
+            </span>
+            {shinyMode && (
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
             )}
-          </button>
+          </div>
 
-          <span
-            className="text-slate-500 hover:text-slate-300 cursor-grab active:cursor-grabbing p-1"
-            title="Arraste para o Team Builder"
-          >
-            <GripVertical className="w-3.5 h-3.5" />
-          </span>
+          <div className="flex items-center gap-1">
+            {/* Botão de Som oficial (Cry) */}
+            <button
+              onClick={handlePlayCry}
+              title="Ouvir som (Cry)"
+              className="p-1 rounded-md bg-white/70 hover:bg-white text-slate-700 hover:text-red-600 transition-colors shadow-sm"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Quick Add ao Time */}
+            <button
+              onClick={handleQuickAdd}
+              disabled={inTeam}
+              title={inTeam ? 'Já está no time' : 'Adicionar ao time (+)'}
+              className={`px-1.5 py-0.5 rounded-md text-[9px] font-extrabold flex items-center gap-1 transition-all shadow-sm ${
+                inTeam
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-white/80 hover:bg-red-600 text-slate-800 hover:text-white'
+              }`}
+            >
+              {inTeam ? (
+                <>
+                  <Check className="w-2.5 h-2.5" />
+                  <span className="hidden sm:inline">Time</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="w-2.5 h-2.5" />
+                  <span>+</span>
+                </>
+              )}
+            </button>
+
+            <span
+              className="text-slate-500 hover:text-slate-800 cursor-grab active:cursor-grabbing p-0.5"
+              title="Arraste para o Team Builder"
+            >
+              <GripVertical className="w-3.5 h-3.5" />
+            </span>
+          </div>
+        </div>
+
+        {/* Base de Batalha (Plataforma redonda estilo GBA) */}
+        <div className="relative flex items-center justify-center mt-3">
+          {/* Anel de grama / pedestal de batalha 2D */}
+          <div className="absolute -bottom-2 w-28 h-8 rounded-[100%] bg-emerald-700/30 border-2 border-emerald-600/40 shadow-inner flex items-center justify-center pointer-events-none">
+            <div className="w-20 h-5 rounded-[100%] bg-emerald-400/40 blur-[1px]"></div>
+          </div>
+
+          {/* Sprite 2D Animado com movimento real */}
+          {!imageLoaded && (
+            <div className="w-20 h-20 flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+          <img
+            src={getSpriteSource()}
+            alt={pokemon.name}
+            loading="lazy"
+            onLoad={() => setImageLoaded(true)}
+            onError={handleImageError}
+            className={`relative z-10 h-24 w-24 object-contain filter drop-shadow-md transition-all duration-200 group-hover:scale-125 group-hover:-translate-y-2 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{
+              imageRendering: 'pixelated',
+            }}
+          />
         </div>
       </div>
 
-      {/* Pokémon Official Artwork Sprite */}
-      <div className="relative flex items-center justify-center p-4 h-40">
-        {!imageLoaded && !imageError && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
-        <img
-          src={spriteSrc}
-          alt={pokemon.name}
-          loading="lazy"
-          onLoad={() => setImageLoaded(true)}
-          onError={() => setImageError(true)}
-          className={`h-32 w-32 object-contain drop-shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      </div>
+      {/* Área Inferior: Nome, Número e Badges de Tipo (Estilo Clean GBA) */}
+      <div className="p-3 bg-white dark:bg-[#142622] flex-1 flex flex-col justify-between">
+        <div className="mb-2">
+          <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-[#f0f4e8] tracking-wide group-hover:text-red-500 transition-colors truncate">
+            {capitalize(pokemon.name)}
+          </h3>
+        </div>
 
-      {/* Bottom Info: Name & Type badges */}
-      <div className="relative p-3.5 pt-0 z-10">
-        <h3 className="font-extrabold text-sm sm:text-base text-white tracking-wide mb-2 group-hover:text-red-400 transition-colors truncate">
-          {capitalize(pokemon.name)}
-        </h3>
-
+        {/* Tipos em Pílulas Coloridas */}
         <div className="flex flex-wrap items-center gap-1.5">
           {pokemon.types && pokemon.types.length > 0 ? (
             pokemon.types.map((t) => {
@@ -164,31 +222,21 @@ export default function PokemonCard({
                 <span
                   key={t}
                   style={{
-                    backgroundColor: `${currentTypeConfig.color}25`,
-                    borderColor: `${currentTypeConfig.color}50`,
-                    color: currentTypeConfig.color,
+                    backgroundColor: currentTypeConfig.color,
                   }}
-                  className="px-2 py-0.5 text-[10px] font-extrabold rounded-md uppercase tracking-wider border"
+                  className="px-2 py-0.5 text-[9px] font-black text-white rounded-md uppercase tracking-wider shadow-sm"
                 >
                   {currentTypeConfig.name}
                 </span>
               );
             })
           ) : (
-            <span className="px-2 py-0.5 text-[10px] font-bold rounded-md uppercase tracking-wider bg-slate-800 text-slate-400">
+            <span className="px-2 py-0.5 text-[9px] font-bold rounded-md uppercase tracking-wider bg-slate-300 text-slate-800">
               {typeConfig.name}
             </span>
           )}
         </div>
       </div>
-
-      {/* Subtle bottom accent line */}
-      <div
-        className="h-[2px] w-full transition-all duration-300 opacity-60 group-hover:opacity-100"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${typeConfig.color}, transparent)`,
-        }}
-      />
     </div>
   );
 }

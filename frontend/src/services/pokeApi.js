@@ -1,18 +1,34 @@
 // Pokémon API Service with memory and localStorage caching
 
-const CACHE_PREFIX = 'pokedex_cache_v2_';
+const CACHE_PREFIX = 'pokedex_cache_v3_';
 const MEMORY_CACHE = new Map();
 
-export const getSpriteUrl = (id, options = {}) => {
-  const { shiny = false, animated = false } = options;
-  if (animated) {
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${shiny ? 'shiny/' : ''}${id}.gif`;
-  }
+// 2D Animated pixel art sprite (Generation V Black/White animated)
+export const get2DAnimatedSpriteUrl = (id, shiny = false) => {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${shiny ? 'shiny/' : ''}${id}.gif`;
+};
+
+// Showdown animated sprite fallback (for Gen 6+)
+export const getShowdownAnimatedSpriteUrl = (id, shiny = false) => {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${shiny ? 'shiny/' : ''}${id}.gif`;
+};
+
+// Static 2D pixel sprite
+export const getFallbackSpriteUrl = (id, shiny = false) => {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shiny ? 'shiny/' : ''}${id}.png`;
+};
+
+// High-res official artwork
+export const getOfficialArtworkUrl = (id, shiny = false) => {
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shiny ? 'shiny/' : ''}${id}.png`;
 };
 
-export const getFallbackSpriteUrl = (id, shiny = false) => {
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shiny ? 'shiny/' : ''}${id}.png`;
+export const getSpriteUrl = (id, options = {}) => {
+  const { shiny = false, animated = true } = options;
+  if (animated) {
+    return get2DAnimatedSpriteUrl(id, shiny);
+  }
+  return getOfficialArtworkUrl(id, shiny);
 };
 
 export const getCryAudioUrl = (id) => {
@@ -20,7 +36,7 @@ export const getCryAudioUrl = (id) => {
 };
 
 export const formatPokemonId = (id) => {
-  return `#${String(id).padStart(4, '0')}`;
+  return `Nº ${String(id).padStart(3, '0')}`;
 };
 
 export const capitalize = (str) => {
@@ -30,12 +46,10 @@ export const capitalize = (str) => {
 
 // Safe cached fetch wrapper
 async function cachedFetch(url, cacheKey, ttlMs = 1000 * 60 * 60 * 24) {
-  // 1. Check memory cache
   if (MEMORY_CACHE.has(cacheKey)) {
     return MEMORY_CACHE.get(cacheKey);
   }
 
-  // 2. Check localStorage
   try {
     const stored = localStorage.getItem(CACHE_PREFIX + cacheKey);
     if (stored) {
@@ -49,14 +63,12 @@ async function cachedFetch(url, cacheKey, ttlMs = 1000 * 60 * 60 * 24) {
     // LocalStorage quota or disabled, ignore
   }
 
-  // 3. Network fetch
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Failed to fetch from ${url} (status: ${res.status})`);
   }
   const data = await res.json();
 
-  // Save to caches
   MEMORY_CACHE.set(cacheKey, data);
   try {
     localStorage.setItem(
@@ -85,19 +97,18 @@ export async function fetchGenerationPokemon(generation) {
         id,
         name: item.name,
         url: item.url,
-        sprite: getSpriteUrl(id),
+        sprite: get2DAnimatedSpriteUrl(id),
       };
     });
     return basicList;
   } catch (err) {
     console.warn(`Failed to fetch generation ${generation.id} from network, fallback to generated IDs:`, err);
-    // Fallback: generate entries mathematically
     const fallbackList = [];
     for (let id = generation.startId; id <= generation.endId; id++) {
       fallbackList.push({
         id,
         name: `Pokemon #${id}`,
-        sprite: getSpriteUrl(id),
+        sprite: get2DAnimatedSpriteUrl(id),
       });
     }
     return fallbackList;
@@ -112,7 +123,6 @@ export async function fetchPokemonDetail(idOrName) {
   try {
     const data = await cachedFetch(url, cacheKey);
     
-    // Extract clean stats
     const stats = {};
     let totalBaseStats = 0;
     data.stats.forEach((s) => {
@@ -132,8 +142,8 @@ export async function fetchPokemonDetail(idOrName) {
       id: data.id,
       name: data.name,
       types,
-      height: data.height / 10, // decimetres to metres
-      weight: data.weight / 10, // hectograms to kg
+      height: data.height / 10,
+      weight: data.weight / 10,
       baseExperience: data.base_experience,
       stats: {
         hp: stats['hp'] || 0,
@@ -145,10 +155,11 @@ export async function fetchPokemonDetail(idOrName) {
         total: totalBaseStats,
       },
       abilities,
-      sprite: getSpriteUrl(data.id),
-      shinySprite: getSpriteUrl(data.id, { shiny: true }),
-      animatedSprite: getSpriteUrl(data.id, { animated: true }),
-      shinyAnimatedSprite: getSpriteUrl(data.id, { shiny: true, animated: true }),
+      sprite: get2DAnimatedSpriteUrl(data.id),
+      shinySprite: get2DAnimatedSpriteUrl(data.id, true),
+      animatedSprite: getShowdownAnimatedSpriteUrl(data.id),
+      shinyAnimatedSprite: getShowdownAnimatedSpriteUrl(data.id, true),
+      artworkSprite: getOfficialArtworkUrl(data.id),
       cryUrl: getCryAudioUrl(data.id),
     };
   } catch (err) {
@@ -165,7 +176,6 @@ export async function fetchPokemonSpecies(id) {
   try {
     const data = await cachedFetch(url, cacheKey);
     
-    // Find Portuguese or English flavor text
     const ptEntry = data.flavor_text_entries.find(
       (entry) => entry.language.name === 'pt' || entry.language.name === 'pt-BR'
     );
@@ -175,7 +185,6 @@ export async function fetchPokemonSpecies(id) {
     const flavorText = (ptEntry || enEntry || { flavor_text: 'Sem descrição disponível.' })
       .flavor_text.replace(/[\n\f\r]/g, ' ');
 
-    // Category / genus (e.g. "Seed Pokémon")
     const genusPt = data.genera.find((g) => g.language.name === 'pt' || g.language.name === 'pt-BR');
     const genusEn = data.genera.find((g) => g.language.name === 'en');
     const genus = (genusPt || genusEn || { genus: 'Pokémon' }).genus;
