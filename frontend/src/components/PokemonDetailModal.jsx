@@ -7,21 +7,12 @@ import {
   fetchPokemonSpecies,
   getCryAudioUrl,
   get2DAnimatedSpriteUrl,
-  getOfficialArtworkUrl,
 } from '../services/pokeApi';
 import {
-  X,
   Volume2,
   Sparkles,
-  Shield,
-  Swords,
-  Heart,
-  Zap,
-  Activity,
   Plus,
   Trash2,
-  Check,
-  Image,
 } from 'lucide-react';
 import { useTeam } from '../context/TeamContext';
 
@@ -33,8 +24,8 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isShiny, setIsShiny] = useState(false);
-  const [showArtwork, setShowArtwork] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [activeTab, setActiveTab] = useState('info'); // 'info' | 'status' | 'fraquezas'
 
   const inTeam = isPokemonInTeam(pokemonId);
 
@@ -53,7 +44,7 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
           setSpecies(spec);
           setLoading(false);
 
-          // Toca o som (Cry) oficial ao carregar a Pokédex
+          // Toca o som (Cry) oficial ao carregar a tela
           if (det?.cryUrl) {
             try {
               setIsPlayingAudio(true);
@@ -71,7 +62,7 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
       .catch((err) => {
         if (isMounted) {
           console.error(err);
-          setError('Não foi possível carregar os detalhes do Pokémon.');
+          setError('Não foi possível carregar os dados do Pokémon.');
           setLoading(false);
         }
       });
@@ -81,20 +72,39 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
     };
   }, [pokemonId]);
 
-  // Handle ESC key
+  // Handle ESC and Arrow Keys to switch pages
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        handleNextPage();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        handlePrevPage();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  }, [onClose, activeTab]);
+
+  const PAGES = ['info', 'status', 'fraquezas'];
+
+  const handleNextPage = () => {
+    const nextIdx = (PAGES.indexOf(activeTab) + 1) % PAGES.length;
+    setActiveTab(PAGES[nextIdx]);
+  };
+
+  const handlePrevPage = () => {
+    const prevIdx = (PAGES.indexOf(activeTab) - 1 + PAGES.length) % PAGES.length;
+    setActiveTab(PAGES[prevIdx]);
+  };
 
   const playCry = () => {
-    if (!detail?.cryUrl) return;
+    const cryUrl = detail?.cryUrl || getCryAudioUrl(pokemonId);
+    if (!cryUrl) return;
     try {
       setIsPlayingAudio(true);
-      const audio = new Audio(detail.cryUrl);
+      const audio = new Audio(cryUrl);
       audio.volume = 0.5;
       audio.play().catch(() => {});
       audio.onended = () => setIsPlayingAudio(false);
@@ -113,16 +123,13 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
         id: detail.id,
         name: detail.name,
         types: detail.types,
-        sprite: isShiny ? detail.shinySprite : detail.sprite,
+        sprite: get2DAnimatedSpriteUrl(pokemonId, isShiny),
         stats: detail.stats,
       });
     }
   };
 
-  const primaryType = detail?.types?.[0] || initialPokemon?.types?.[0] || 'normal';
-  const typeConfig = POKEMON_TYPES[primaryType] || POKEMON_TYPES.normal;
   const effectiveness = detail ? getDefensiveEffectiveness(detail.types) : {};
-
   const weaknesses = [];
   const resistances = [];
   const immunities = [];
@@ -136,387 +143,478 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
   const getStatPercent = (val) => Math.min(100, Math.round((val / 200) * 100));
 
   const getStatColor = (val) => {
-    if (val >= 130) return 'bg-emerald-500';
-    if (val >= 90) return 'bg-blue-500';
-    if (val >= 60) return 'bg-amber-500';
-    return 'bg-red-500';
+    if (val >= 130) return 'bg-[#28b878]';
+    if (val >= 90) return 'bg-[#3898f8]';
+    if (val >= 60) return 'bg-[#f8a828]';
+    return 'bg-[#d83828]';
   };
 
-  const activeSprite = showArtwork
-    ? getOfficialArtworkUrl(pokemonId, isShiny)
-    : get2DAnimatedSpriteUrl(pokemonId, isShiny);
+  const pokemonName = detail?.name || initialPokemon?.name || `Pokemon #${pokemonId}`;
+  const formattedId = String(pokemonId).padStart(3, '0');
+
+  // Title bar text based on current GBA page
+  const getHeaderTitle = () => {
+    if (activeTab === 'info') return 'POKÉMON INFO';
+    if (activeTab === 'status') return 'POKÉMON SKILLS';
+    return 'EFICÁCIA BATALHA';
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/85 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto bg-black/85 backdrop-blur-sm select-none">
       {/* Backdrop click to close */}
       <div className="fixed inset-0" onClick={onClose} />
 
+      {/* Caixa Principal da Tela de Status estilo GBA (Pokémon FireRed / Emerald) */}
       <div
-        className="relative w-full max-w-3xl rounded-3xl bg-slate-900 border-2 border-slate-700 shadow-2xl overflow-hidden z-10 max-h-[92vh] flex flex-col my-auto"
+        className="relative w-full max-w-2xl bg-[#3da496] border-4 border-[#0c2e28] rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.8),inset_0_2px_0_#68c8bc,inset_0_-2px_0_#20645c] overflow-hidden z-10 flex flex-col my-auto"
         style={{
-          boxShadow: `0 25px 60px -15px ${typeConfig.color}60`,
+          boxShadow: 'inset 0 0 0 2px #50b0a2, 0 15px 35px rgba(0, 0, 0, 0.75)',
         }}
       >
-        {/* Header Ribbon Estilo Pokédex */}
-        <div
-          className="relative px-6 py-4 flex items-center justify-between border-b border-white/10"
-          style={{
-            background: `linear-gradient(135deg, ${typeConfig.color}40, rgba(15, 23, 42, 0.95))`,
-          }}
-        >
-          <div className="flex items-center gap-3">
-            {/* Lente circular luminosa que pisca com o som do Pokémon */}
-            <div className={`relative w-8 h-8 rounded-full border-2 border-white flex items-center justify-center ${isPlayingAudio ? 'bg-cyan-400 shadow-[0_0_20px_#22d3ee] scale-110 animate-pulse' : 'bg-cyan-600 shadow-[0_0_8px_#0891b2]'}`}>
-              <div className="w-2.5 h-2.5 rounded-full bg-white/80 absolute top-1 left-1"></div>
+        {/* Barra Superior estilo GBA (POKÉMON INFO / +PAGE / CANCEL) */}
+        <div className="relative px-3 sm:px-4 py-2.5 bg-[#3da496] border-b-2 border-[#1a5048] flex items-center justify-between shadow-sm">
+          {/* Lado Esquerdo: Indicador Oval + Dots + Título GBA */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Cápsula Oval luminosa retrô */}
+            <div className="w-3.5 h-6 rounded-full bg-[#f8faf8] border-2 border-[#1c4840] shadow-inner flex items-center justify-center">
+              <div className="w-1.5 h-3 rounded-full bg-[#b8d4d0]/60" />
             </div>
 
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs sm:text-sm font-extrabold text-amber-300 bg-black/50 px-2 py-0.5 rounded-md border border-amber-400/30">
-                  {formatPokemonId(pokemonId)}
-                </span>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  {capitalize(detail?.name || initialPokemon?.name || `Pokemon #${pokemonId}`)}
-                </h2>
-              </div>
-              {species?.genus && (
-                <p className="text-xs text-slate-300 font-medium mt-0.5">
-                  {species.genus}
-                </p>
-              )}
+            {/* Dois pontinhos/botões azuis do GBA */}
+            <div className="flex flex-col gap-1">
+              <div className="w-2 h-2 rounded-full bg-[#185868] border border-[#308898]" />
+              <div className="w-2 h-2 rounded-full bg-[#185868] border border-[#308898]" />
             </div>
+
+            {/* Título da tela com drop-shadow pixelado */}
+            <h2
+              className="text-xs sm:text-sm font-black text-white tracking-widest pl-1"
+              style={{
+                textShadow: '2px 2px 0px #18443e, -1px -1px 0px #18443e',
+              }}
+            >
+              {getHeaderTitle()}
+            </h2>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Lado Direito: Botões +PAGE e (A)CANCEL */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
-              onClick={handleTeamAction}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md ${
-                inTeam
-                  ? 'bg-red-500/20 text-red-300 border border-red-500/40 hover:bg-red-500/30'
-                  : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black'
-              }`}
+              onClick={handleNextPage}
+              title="Trocar página (ou use as setas ← → do teclado)"
+              className="px-2 sm:px-2.5 py-1 text-[9px] sm:text-[10px] font-black rounded-sm bg-[#e8ece8] hover:bg-white text-[#183830] border-2 border-[#184840] shadow-[0_2px_0_#14342e] active:translate-y-0.5 active:shadow-none flex items-center gap-1 cursor-pointer transition-all"
             >
-              {inTeam ? (
-                <>
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Remover do Time</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Adicionar ao Time</span>
-                </>
-              )}
+              <span className="text-[#388878] font-black">+</span>
+              <span>PAGE</span>
             </button>
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700"
+              title="Fechar (Esc)"
+              className="px-2 sm:px-2.5 py-1 text-[9px] sm:text-[10px] font-black rounded-sm bg-[#e8ece8] hover:bg-[#fedcd0] text-[#881810] border-2 border-[#184840] shadow-[0_2px_0_#14342e] active:translate-y-0.5 active:shadow-none flex items-center gap-1 cursor-pointer transition-all"
             >
-              <X className="w-5 h-5" />
+              <span className="text-[#d83828] font-black">A</span>
+              <span>CANCEL</span>
             </button>
           </div>
         </div>
 
-        {/* Modal Content */}
-        <div className="p-6 overflow-y-auto space-y-6">
+        {/* Abas Rápidas de Navegação das Páginas do GBA */}
+        <div className="flex items-center gap-1 px-3 py-1 bg-[#28746a] border-b-2 border-[#184840] text-[9px] sm:text-[10px] overflow-x-auto">
+          <span className="text-[#a4e0d4] mr-1 hidden sm:inline font-bold">TELA:</span>
+          <button
+            onClick={() => setActiveTab('info')}
+            className={`px-2 py-0.5 rounded-sm border cursor-pointer font-bold transition-all ${
+              activeTab === 'info'
+                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm'
+                : 'bg-[#1e5850] text-[#b8e8dc] border-[#16443c] hover:bg-[#28685c]'
+            }`}
+          >
+            1. INFO
+          </button>
+          <button
+            onClick={() => setActiveTab('status')}
+            className={`px-2 py-0.5 rounded-sm border cursor-pointer font-bold transition-all ${
+              activeTab === 'status'
+                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm'
+                : 'bg-[#1e5850] text-[#b8e8dc] border-[#16443c] hover:bg-[#28685c]'
+            }`}
+          >
+            2. STATUS
+          </button>
+          <button
+            onClick={() => setActiveTab('fraquezas')}
+            className={`px-2 py-0.5 rounded-sm border cursor-pointer font-bold transition-all ${
+              activeTab === 'fraquezas'
+                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm'
+                : 'bg-[#1e5850] text-[#b8e8dc] border-[#16443c] hover:bg-[#28685c]'
+            }`}
+          >
+            3. FRAQUEZAS
+          </button>
+        </div>
+
+        {/* Corpo da Tela GBA */}
+        <div className="p-2.5 sm:p-3.5 space-y-2.5 sm:space-y-3 bg-[#3da496] max-h-[82vh] overflow-y-auto">
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center gap-3">
-              <div className="w-10 h-10 border-3 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-sm font-semibold text-slate-400">Carregando dados da Pokédex...</p>
+            <div className="py-20 flex flex-col items-center justify-center gap-3 bg-[#fff8f0] border-2 border-[#c87868] rounded-sm p-8">
+              <div className="w-8 h-8 border-4 border-[#388878] border-t-transparent rounded-full animate-spin" />
+              <p className="text-[11px] font-bold text-[#1c3830] tracking-wider">
+                LENDO CARTUCHO...
+              </p>
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-red-400 text-sm font-semibold">
+            <div className="py-12 text-center text-[#d83828] text-xs font-bold bg-[#fff0f0] border-2 border-[#d83828] p-4 rounded-sm">
               {error}
             </div>
           ) : (
             <>
-              {/* Top Section: Sprite 2D no Pedestal de Batalha */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+              {/* Seção Superior: Caixa Lilás do Sprite (Esquerda) e Painel Listrado Pêssego (Direita) */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-stretch">
                 
-                {/* Sprite Box com Campo de Batalha 2D */}
-                <div
-                  className="md:col-span-5 relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 overflow-hidden shadow-inner"
-                  style={{
-                    backgroundColor: typeConfig.cardBg || '#d7f7e6',
-                    borderColor: typeConfig.cardBorder || '#9fe4be',
-                  }}
-                >
-                  {/* Sprite 2D em movimento sobre o anel de grama */}
-                  <div className="relative h-44 w-44 flex items-center justify-center">
-                    {/* Plataforma de batalha estilo Game Boy */}
-                    <div className="absolute bottom-2 w-36 h-10 rounded-[100%] bg-emerald-700/40 border-2 border-emerald-600/50 flex items-center justify-center">
-                      <div className="w-28 h-6 rounded-[100%] bg-emerald-400/50 blur-[1px]"></div>
+                {/* === COLUNA ESQUERDA: QUADRO DO POKÉMON COM SPRITE GIGANTE (FRLG) === */}
+                <div className="sm:col-span-5 flex flex-col">
+                  {/* Faixa Roxa/Lilás com Nível e Nome */}
+                  <div className="bg-[#8078b8] border-t-2 border-x-2 border-[#585088] rounded-t-sm px-2.5 py-1.5 flex items-center justify-between text-white shadow-sm">
+                    <span className="text-[10px] font-black tracking-wider text-[#fcfcff]">
+                      Lv50
+                    </span>
+                    <span className="text-[10px] font-black tracking-wider uppercase text-white truncate max-w-[100px]">
+                      {pokemonName}
+                    </span>
+                    {/* Símbolo de Gênero estilo GBA */}
+                    <span className="text-[11px] font-extrabold text-[#2858b8] drop-shadow-[0_1px_0_#ffffff]">
+                      ♂
+                    </span>
+                  </div>
+
+                  {/* Quadro Branco com Listras Horizontais Sutis + Sprite GRANDE em Pixel Art */}
+                  <div
+                    className="relative flex-1 min-h-[190px] sm:min-h-[210px] flex items-center justify-center border-2 border-[#585088] overflow-hidden"
+                    style={{
+                      background:
+                        'repeating-linear-gradient(to bottom, #ffffff 0px, #ffffff 3px, #e8edf0 3px, #e8edf0 6px)',
+                    }}
+                  >
+                    {/* Sombra / Pedestal oval da batalha sob o Pokémon */}
+                    <div className="absolute bottom-4 w-32 sm:w-36 h-7 rounded-[100%] bg-[#b8c8c0]/70 border border-[#98a8a0] shadow-inner pointer-events-none" />
+
+                    {/* SPRITE DO POKÉMON: Grande, Nítido e Animado em Pixel Art */}
+                    <div className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center">
+                      <img
+                        src={get2DAnimatedSpriteUrl(pokemonId, isShiny)}
+                        alt={pokemonName}
+                        style={{
+                          imageRendering: 'pixelated',
+                        }}
+                        className="max-h-36 max-w-36 sm:max-h-44 sm:max-w-44 object-contain scale-[1.75] sm:scale-[2.0] transform-gpu filter drop-shadow-md select-none pointer-events-none"
+                      />
                     </div>
 
+                    {/* Mini Pokéball no Canto Inferior Direito (igual na referência) */}
                     <img
-                      src={activeSprite}
-                      alt={detail.name}
+                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+                      alt="Pokéball"
                       style={{ imageRendering: 'pixelated' }}
-                      className="relative z-10 max-h-36 max-w-36 object-contain filter drop-shadow-xl animate-bounce-subtle"
+                      className="absolute bottom-2 right-2 w-5 h-5 object-contain opacity-95 drop-shadow pointer-events-none"
                     />
                   </div>
 
-                  {/* Controles de Sprite e Som */}
-                  <div className="flex items-center gap-2 mt-4 z-10">
+                  {/* Botões de Ação do Sprite: Som (Cry), Shiny e Time (SEM botão de Arte) */}
+                  <div className="flex items-center justify-between gap-1.5 mt-2">
+                    {/* Botão de Som (Cry) */}
                     <button
                       onClick={playCry}
-                      title="Ouvir som oficial (Cry)"
-                      className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all border shadow-sm ${
+                      title="Tocar Som oficial (Cry)"
+                      className={`flex-1 py-1.5 px-1 rounded-sm text-[9px] font-black flex items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
                         isPlayingAudio
-                          ? 'bg-red-600 text-white border-red-400 animate-pulse'
-                          : 'bg-white/90 hover:bg-white text-slate-800 border-slate-300'
+                          ? 'bg-[#d83828] text-white border-[#881810] animate-pulse'
+                          : 'bg-[#eef2ee] hover:bg-white text-[#183828] border-[#688878] shadow-[0_2px_0_#486054] active:translate-y-0.5 active:shadow-none'
                       }`}
                     >
-                      <Volume2 className="w-3.5 h-3.5 text-red-600" />
-                      <span>Som</span>
+                      <Volume2 className="w-3 h-3 text-[#d83828]" />
+                      <span>SOM</span>
                     </button>
 
+                    {/* Botão Shiny */}
                     <button
                       onClick={() => setIsShiny(!isShiny)}
                       title="Alternar versão Shiny"
-                      className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all border shadow-sm ${
+                      className={`flex-1 py-1.5 px-1 rounded-sm text-[9px] font-black flex items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
                         isShiny
-                          ? 'bg-amber-500 text-slate-950 border-amber-300'
-                          : 'bg-white/90 hover:bg-white text-slate-800 border-slate-300'
+                          ? 'bg-[#f8c830] text-[#381c00] border-[#986808] shadow-[0_2px_0_#684000]'
+                          : 'bg-[#eef2ee] hover:bg-white text-[#183828] border-[#688878] shadow-[0_2px_0_#486054] active:translate-y-0.5 active:shadow-none'
                       }`}
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Shiny</span>
+                      <Sparkles className="w-3 h-3 text-[#d89810]" />
+                      <span>SHINY</span>
                     </button>
 
+                    {/* Botão de Equipe (Time) */}
                     <button
-                      onClick={() => setShowArtwork(!showArtwork)}
-                      title="Alternar entre Sprite 2D e Arte Oficial"
-                      className="p-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all border shadow-sm bg-white/90 hover:bg-white text-slate-800 border-slate-300"
+                      onClick={handleTeamAction}
+                      title={inTeam ? 'Remover da equipe' : 'Adicionar à equipe'}
+                      className={`flex-1 py-1.5 px-1 rounded-sm text-[9px] font-black flex items-center justify-center gap-1 border-2 transition-all cursor-pointer shadow-[0_2px_0_rgba(0,0,0,0.3)] active:translate-y-0.5 active:shadow-none ${
+                        inTeam
+                          ? 'bg-[#d84838] hover:bg-[#e85848] text-white border-[#881810]'
+                          : 'bg-[#38a868] hover:bg-[#48b878] text-white border-[#186838]'
+                      }`}
                     >
-                      <Image className="w-3.5 h-3.5 text-blue-600" />
-                      <span>{showArtwork ? '2D Sprite' : 'Arte'}</span>
+                      {inTeam ? (
+                        <>
+                          <Trash2 className="w-3 h-3" />
+                          <span>-TIME</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3 h-3" />
+                          <span>+TIME</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
 
-                {/* Atributos Básicos & Descrição */}
-                <div className="md:col-span-7 space-y-4">
-                  {/* Tipos */}
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
-                      Tipagem
-                    </span>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {detail.types.map((t) => {
-                        const tc = POKEMON_TYPES[t] || POKEMON_TYPES.normal;
-                        return (
-                          <div
-                            key={t}
-                            style={{
-                              backgroundColor: tc.color,
-                            }}
-                            className="px-3 py-1 text-xs font-black text-white rounded-lg uppercase tracking-wider shadow-sm flex items-center gap-1.5"
-                          >
-                            <span>{tc.name}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                {/* === COLUNA DIREITA: DADOS ESPECÍFICOS DA PÁGINA (FRLG ESTILO PÊSSEGO) === */}
+                <div
+                  className="sm:col-span-7 p-2.5 sm:p-3 border-2 border-[#d08878] rounded-sm flex flex-col justify-between"
+                  style={{
+                    background:
+                      'repeating-linear-gradient(to bottom, #fff5f0 0px, #fff5f0 3px, #fed8cb 3px, #fed8cb 6px)',
+                  }}
+                >
+                  {/* CONTEÚDO DA PÁGINA 1: INFO (EXATAMENTE IGUAL À IMAGEM DE REFERÊNCIA) */}
+                  {activeTab === 'info' && (
+                    <div className="space-y-2">
+                      {/* Linha No */}
+                      <div className="flex items-center gap-3">
+                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                          No
+                        </span>
+                        <span className="text-xs sm:text-sm font-black text-[#182838] tracking-wider">
+                          {formattedId}
+                        </span>
+                      </div>
 
-                  {/* Flavor Text (Descrição da Pokédex) */}
-                  {species?.flavorText && (
-                    <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700">
-                      <p className="text-xs sm:text-sm text-slate-200 italic leading-relaxed">
-                        "{species.flavorText}"
-                      </p>
-                    </div>
-                  )}
+                      {/* Linha NAME */}
+                      <div className="flex items-center gap-3">
+                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                          NAME
+                        </span>
+                        <span className="text-xs sm:text-sm font-black text-[#182838] uppercase tracking-wide truncate">
+                          {pokemonName}
+                        </span>
+                      </div>
 
-                  {/* Medidas Físicas */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
-                      <span className="text-[10px] font-bold uppercase text-slate-400 block">
-                        Altura
-                      </span>
-                      <span className="text-sm font-extrabold text-white">
-                        {detail.height} m
-                      </span>
-                    </div>
+                      {/* Linha TYPE */}
+                      <div className="flex items-center gap-3">
+                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                          TYPE
+                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {detail?.types?.map((t) => {
+                            const tc = POKEMON_TYPES[t] || POKEMON_TYPES.normal;
+                            return (
+                              <span
+                                key={t}
+                                style={{ backgroundColor: tc.color }}
+                                className="px-2 py-0.5 rounded-sm text-[9px] sm:text-[10px] font-black text-white uppercase border border-black/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.3)]"
+                              >
+                                {tc.name}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
 
-                    <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
-                      <span className="text-[10px] font-bold uppercase text-slate-400 block">
-                        Peso
-                      </span>
-                      <span className="text-sm font-extrabold text-white">
-                        {detail.weight} kg
-                      </span>
-                    </div>
-                  </div>
+                      {/* Linha OT / ALTURA */}
+                      <div className="flex items-center gap-3">
+                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                          ALTURA
+                        </span>
+                        <span className="text-xs sm:text-sm font-black text-[#182838]">
+                          {detail?.height} m
+                        </span>
+                      </div>
 
-                  {/* Habilidades */}
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
-                      Habilidades
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {detail.abilities.map((ab) => (
-                        <span
-                          key={ab.name}
-                          className={`text-xs px-2.5 py-1 rounded-lg border font-semibold ${
-                            ab.isHidden
-                              ? 'bg-purple-950/50 text-purple-200 border-purple-500/40'
-                              : 'bg-slate-800 text-slate-200 border-slate-700'
-                          }`}
-                        >
-                          {capitalize(ab.name.replace('-', ' '))}
-                          {ab.isHidden && (
-                            <span className="ml-1 text-[9px] text-purple-300 font-bold">
-                              (Oculta)
+                      {/* Linha IDNo / PESO */}
+                      <div className="flex items-center gap-3">
+                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                          PESO
+                        </span>
+                        <span className="text-xs sm:text-sm font-black text-[#182838]">
+                          {detail?.weight} kg
+                        </span>
+                      </div>
+
+                      {/* Linha ITEM / HABILIDADE */}
+                      <div className="flex items-center gap-3">
+                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                          HABILIDADE
+                        </span>
+                        <div className="text-[10px] sm:text-[11px] font-black text-[#182838] uppercase truncate">
+                          {capitalize(detail?.abilities?.[0]?.name?.replace('-', ' ') || 'NENHUMA')}
+                          {detail?.abilities?.[0]?.isHidden && (
+                            <span className="ml-1 text-[8px] text-[#702888]">
+                              (OCULTA)
                             </span>
                           )}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* Status da Pokédex (Barras de Estatísticas) */}
-              <div className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/80">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-emerald-400" />
-                    <h3 className="text-xs font-black uppercase tracking-wider text-white">
-                      Estatísticas Base (Status)
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-slate-300">
-                    <span>BST Total:</span>
-                    <span className="text-amber-400 font-extrabold text-sm px-2 py-0.5 rounded-md bg-slate-900 border border-slate-700">
-                      {detail.stats.total}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-                  {[
-                    { key: 'hp', label: 'HP', val: detail.stats.hp, icon: Heart, color: 'text-rose-400' },
-                    { key: 'attack', label: 'Ataque', val: detail.stats.attack, icon: Swords, color: 'text-orange-400' },
-                    { key: 'defense', label: 'Defesa', val: detail.stats.defense, icon: Shield, color: 'text-amber-400' },
-                    { key: 'specialAttack', label: 'Atq. Especial', val: detail.stats.specialAttack, icon: Zap, color: 'text-cyan-400' },
-                    { key: 'specialDefense', label: 'Def. Especial', val: detail.stats.specialDefense, icon: Shield, color: 'text-blue-400' },
-                    { key: 'speed', label: 'Velocidade', val: detail.stats.speed, icon: Activity, color: 'text-emerald-400' },
-                  ].map((stat) => (
-                    <div key={stat.key} className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-300 font-semibold flex items-center gap-1.5">
-                          <stat.icon className={`w-3.5 h-3.5 ${stat.color}`} />
-                          {stat.label}
-                        </span>
-                        <span className="font-mono font-bold text-white">
-                          {stat.val}
-                        </span>
-                      </div>
-                      <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${getStatColor(stat.val)}`}
-                          style={{ width: `${getStatPercent(stat.val)}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Fraquezas e Resistências */}
-              <div className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/80">
-                <h3 className="text-xs font-black uppercase tracking-wider text-white mb-3 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-blue-400" />
-                  Eficácia Defensiva (Fraquezas e Resistências)
-                </h3>
-
-                <div className="space-y-3">
-                  {/* Fraquezas */}
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-red-400 block mb-1.5">
-                      Fraquezas (Dano aumentado)
-                    </span>
-                    {weaknesses.length === 0 ? (
-                      <p className="text-xs text-slate-400 italic">Sem fraquezas identificadas.</p>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5">
-                        {weaknesses.map(({ type, mult }) => {
-                          const tc = POKEMON_TYPES[type] || POKEMON_TYPES.normal;
-                          return (
-                            <span
-                              key={type}
-                              style={{ borderColor: `${tc.color}80` }}
-                              className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-900 border text-slate-100 flex items-center gap-1 shadow-sm"
-                            >
-                              <span
-                                className="w-1.5 h-1.5 rounded-full"
-                                style={{ backgroundColor: tc.color }}
-                              />
-                              {tc.name}
-                              <span className="text-red-400 font-extrabold">{mult}x</span>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Resistências */}
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-emerald-400 block mb-1.5">
-                      Resistências (Dano reduzido)
-                    </span>
-                    {resistances.length === 0 ? (
-                      <p className="text-xs text-slate-400 italic">Nenhuma resistência especial.</p>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5">
-                        {resistances.map(({ type, mult }) => {
-                          const tc = POKEMON_TYPES[type] || POKEMON_TYPES.normal;
-                          return (
-                            <span
-                              key={type}
-                              style={{ borderColor: `${tc.color}80` }}
-                              className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-900 border text-slate-100 flex items-center gap-1 shadow-sm"
-                            >
-                              <span
-                                className="w-1.5 h-1.5 rounded-full"
-                                style={{ backgroundColor: tc.color }}
-                              />
-                              {tc.name}
-                              <span className="text-emerald-400 font-extrabold">{mult}x</span>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Imunidades */}
-                  {immunities.length > 0 && (
-                    <div>
-                      <span className="text-[10px] font-bold uppercase text-purple-400 block mb-1.5">
-                        Imunidades (Dano 0x)
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {immunities.map(({ type }) => {
-                          const tc = POKEMON_TYPES[type] || POKEMON_TYPES.normal;
-                          return (
-                            <span
-                              key={type}
-                              className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-950/60 border border-purple-500/50 text-purple-200 flex items-center gap-1 shadow-sm"
-                            >
-                              {tc.name}
-                              <span className="text-purple-300 font-extrabold">0x</span>
-                            </span>
-                          );
-                        })}
+                        </div>
                       </div>
                     </div>
                   )}
+
+                  {/* CONTEÚDO DA PÁGINA 2: STATUS (POKÉMON SKILLS ESTILO GBA) */}
+                  {activeTab === 'status' && (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between pb-1 border-b border-[#e09888]">
+                        <span className="text-[10px] font-black text-[#182838]">
+                          ATRIBUTOS BASE
+                        </span>
+                        <span className="text-[10px] font-black text-[#d83828]">
+                          BST: {detail?.stats?.total}
+                        </span>
+                      </div>
+
+                      {[
+                        { label: 'HP', val: detail?.stats?.hp, color: '#e84838' },
+                        { label: 'ATAQUE', val: detail?.stats?.attack, color: '#f07828' },
+                        { label: 'DEFESA', val: detail?.stats?.defense, color: '#e8a820' },
+                        { label: 'ATQ.ESP', val: detail?.stats?.specialAttack, color: '#2898e8' },
+                        { label: 'DEF.ESP', val: detail?.stats?.specialDefense, color: '#38b868' },
+                        { label: 'VELOC.', val: detail?.stats?.speed, color: '#8858b8' },
+                      ].map((st) => (
+                        <div key={st.label} className="space-y-0.5">
+                          <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-black">
+                            <span className="text-[#384858]">{st.label}</span>
+                            <span className="text-[#182838] font-mono">{st.val}</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-[#e0cece] rounded-none border border-[#b89898] overflow-hidden">
+                            <div
+                              className="h-full"
+                              style={{
+                                width: `${getStatPercent(st.val)}%`,
+                                backgroundColor: st.color,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* CONTEÚDO DA PÁGINA 3: EFICÁCIA E FRAQUEZAS */}
+                  {activeTab === 'fraquezas' && (
+                    <div className="space-y-2 text-[9px] sm:text-[10px]">
+                      <div>
+                        <span className="font-black text-[#b82818] block mb-1">
+                          FRAQUEZAS (DANO AUMENTADO):
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {weaknesses.length === 0 ? (
+                            <span className="text-[#586878]">Nenhuma fraqueza</span>
+                          ) : (
+                            weaknesses.map(({ type, mult }) => {
+                              const tc = POKEMON_TYPES[type] || POKEMON_TYPES.normal;
+                              return (
+                                <span
+                                  key={type}
+                                  style={{ backgroundColor: tc.color }}
+                                  className="px-1.5 py-0.5 rounded-sm text-white font-black text-[9px] border border-black/20 flex items-center gap-1"
+                                >
+                                  {tc.name}
+                                  <span className="bg-black/30 px-1 rounded-sm text-white">
+                                    {mult}x
+                                  </span>
+                                </span>
+                              );
+                            })
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="pt-1.5 border-t border-[#e09888]">
+                        <span className="font-black text-[#187838] block mb-1">
+                          RESISTÊNCIAS (DANO REDUZIDO):
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {resistances.length === 0 ? (
+                            <span className="text-[#586878]">Nenhuma resistência</span>
+                          ) : (
+                            resistances.map(({ type, mult }) => {
+                              const tc = POKEMON_TYPES[type] || POKEMON_TYPES.normal;
+                              return (
+                                <span
+                                  key={type}
+                                  style={{ backgroundColor: tc.color }}
+                                  className="px-1.5 py-0.5 rounded-sm text-white font-black text-[9px] border border-black/20 flex items-center gap-1"
+                                >
+                                  {tc.name}
+                                  <span className="bg-black/30 px-1 rounded-sm text-white">
+                                    {mult}x
+                                  </span>
+                                </span>
+                              );
+                            })
+                          )}
+                        </div>
+                      </div>
+
+                      {immunities.length > 0 && (
+                        <div className="pt-1.5 border-t border-[#e09888]">
+                          <span className="font-black text-[#582888] block mb-1">
+                            IMUNIDADES (0x):
+                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {immunities.map(({ type }) => {
+                              const tc = POKEMON_TYPES[type] || POKEMON_TYPES.normal;
+                              return (
+                                <span
+                                  key={type}
+                                  style={{ backgroundColor: tc.color }}
+                                  className="px-1.5 py-0.5 rounded-sm text-white font-black text-[9px] border border-black/20"
+                                >
+                                  {tc.name} 0x
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* === SEÇÃO INFERIOR: TRAINER MEMO / DESCRIÇÃO DA POKÉDEX (FRLG) === */}
+              <div>
+                {/* Aba de Cabeçalho TRAINER MEMO */}
+                <div className="flex items-center">
+                  <span className="px-2.5 py-1 rounded-t-sm bg-[#687890] border-t-2 border-x-2 border-[#485870] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-sm">
+                    TRAINER MEMO
+                  </span>
+                </div>
+
+                {/* Caixa de Texto estilo Pergaminho / Memo GBA com Listras Horizontais */}
+                <div
+                  className="p-3 border-2 border-[#d08878] rounded-b-sm rounded-tr-sm text-[#182838]"
+                  style={{
+                    background:
+                      'repeating-linear-gradient(to bottom, #fffaf4 0px, #fffaf4 4px, #fcece0 4px, #fcece0 8px)',
+                  }}
+                >
+                  {/* Linha de Natureza / Local (estilo FireRed) */}
+                  <p className="text-[10px] sm:text-[11px] font-black text-[#284858] mb-1">
+                    {species?.genus ? `${species.genus.toUpperCase()} nature.` : 'DOCILE nature.'}
+                  </p>
+                  <p className="text-[10px] sm:text-[11px] font-bold text-[#486070] mb-2">
+                    Met in PALLET TOWN at Lv 5.
+                  </p>
+
+                  {/* Texto de Descrição da Pokédex */}
+                  <p className="text-[10px] sm:text-[11px] leading-relaxed text-[#182838] font-bold">
+                    "{species?.flavorText || 'A strange seed was planted on its back at birth. The plant sprouts and grows with this POKÉMON.'}"
+                  </p>
                 </div>
               </div>
             </>
