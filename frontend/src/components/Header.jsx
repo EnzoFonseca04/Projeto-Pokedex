@@ -104,33 +104,28 @@ export default function Header({
               <span className="tracking-wide">SHINY</span>
             </button>
 
-            {/* BOTÃO TEAM BUILDER: Pílula Vermelha + Contador Oval Dourado estilo GBA (igual à imagem) */}
+            {/* BOTÃO TEAM BUILDER — estilo caixa de diálogo Pokémon Emerald */}
             <button
               onClick={onOpenTeamDrawer}
               title="Abrir Team Builder"
-              className="relative inline-flex items-center gap-0 cursor-pointer active:scale-95 transition-all group select-none"
+              className="relative inline-flex items-center cursor-pointer active:translate-y-0.5 transition-all group select-none shadow-[0_3px_0_#182028] active:shadow-none"
+              style={{
+                background: '#f0f4e8',
+                border: '3px solid #182028',
+                boxShadow: 'inset 0 0 0 2px #f0f4e8, inset 0 0 0 3px #182028, 0 3px 0 #0a0e14',
+                borderRadius: 0,
+                padding: '4px 10px 4px 6px',
+              }}
             >
-              {/* Contador Oval Escuro com borda dourada — fica sobreposto à esquerda da pílula */}
+              {/* Badge de contador estilo cartão GBA */}
               <span
-                className="relative z-10 flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#101828] border-[3px] border-[#f8c820] shadow-[0_0_6px_#f8c820aa] mr-[-10px]"
+                className="flex items-center justify-center font-black text-[10px] sm:text-[11px] mr-2 px-1.5 py-0.5 border-2 border-[#182028]"
+                style={{ background: '#d8e8d0', color: '#182028', borderRadius: 0 }}
               >
-                <span className="text-[#f8d030] font-black text-[9px] sm:text-[10px] leading-none tracking-tight">
-                  {teamCount}/6
-                </span>
-                {/* Mini Pokéball abaixo do contador — detalhe fiel à imagem */}
-                <span className="mt-0.5 text-[7px] leading-none" title="Pokéball">🔴</span>
+                {teamCount}/6
               </span>
-
-              {/* Pílula principal vermelha */}
-              <span
-                className="inline-flex items-center pl-5 pr-4 py-2 sm:py-2.5 rounded-full font-black text-white text-[10px] sm:text-xs tracking-wide drop-shadow-sm"
-                style={{
-                  background: 'linear-gradient(to bottom, #f04858 0%, #c82030 60%, #a81828 100%)',
-                  boxShadow: '0 3px 0 #781018, inset 0 1px 0 rgba(255,255,255,0.3)',
-                  border: '2px solid rgba(255,255,255,0.35)',
-                }}
-              >
-                Team Builder
+              <span className="font-black text-[10px] sm:text-xs text-[#182028] uppercase tracking-wide">
+                TEAM
               </span>
             </button>
           </div>
