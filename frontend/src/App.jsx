@@ -177,52 +177,52 @@ export default function App() {
         {/* Main Container */}
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
           
-          {/* Banner com Informações do Campo de Batalha / Região */}
-          <div className="relative rounded-3xl overflow-hidden p-6 sm:p-8 border-2 border-[#d8e4c8]/30 bg-[#122824]/85 backdrop-blur-md shadow-2xl">
+          {/* Banner com Informações do Campo de Batalha / Região (Estilo GBA) */}
+          <div className="relative rounded-sm overflow-hidden p-5 sm:p-7 border-2 border-[#38685c] bg-[#122824]/90 backdrop-blur-md shadow-[0_6px_25px_rgba(0,0,0,0.6)]">
             <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
             
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold mb-3">
-                  <Swords className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Campo de Batalha Pokémon • Game Boy Advance</span>
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-[#183630] border border-[#38685c] text-[#a4e0d4] text-[10px] font-black mb-2.5">
+                  <Swords className="w-3.5 h-3.5 text-[#38b878]" />
+                  <span>CAMPO DE BATALHA POKÉMON • GBA FIRE RED / EMERALD</span>
                 </div>
-                <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight uppercase">
                   {activeGen ? (
                     <>
-                      Região de <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-amber-300">{activeGen.region}</span>
+                      REGIÃO DE <span className="text-[#f8d030]">{activeGen.region}</span>
                     </>
                   ) : (
-                    'Todas as Gerações'
+                    'TODAS AS GERAÇÕES'
                   )}
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-xl leading-relaxed">
+                <p className="text-[10px] sm:text-xs text-[#c8e8dc] mt-2 max-w-xl leading-relaxed font-bold">
                   {activeGen
-                    ? `${activeGen.name} (${activeGen.games}) • Pokémon de #${String(activeGen.startId).padStart(3, '0')} a #${String(activeGen.endId).padStart(3, '0')}. Sprites 2D animados em movimento real. Clique no Pokémon para abrir seus status na Pokédex!`
-                    : 'Catálogo geral de Pokémon com sprites animados em 2D. Clique em qualquer card para inspecionar os status da criatura.'}
+                    ? `${activeGen.name.toUpperCase()} (${activeGen.games}) • POKÉMON #${String(activeGen.startId).padStart(3, '0')} A #${String(activeGen.endId).padStart(3, '0')}. Sprites 2D animados em movimento real. Clique no Pokémon para abrir o status GBA!`
+                    : 'Catálogo de Pokémon com sprites animados em pixel art 2D. Clique em qualquer card para abrir os status na Pokédex.'}
                 </p>
               </div>
 
-              {/* Quick stats badge */}
+              {/* Quick stats badge estilo GBA */}
               <div className="flex items-center gap-3">
-                <div className="p-4 rounded-2xl bg-[#0c1b18]/90 border border-emerald-500/30 text-center min-w-[100px] shadow-lg">
-                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                    No Campo
+                <div className="p-3.5 rounded-sm bg-[#0c1c18] border-2 border-[#2c544a] text-center min-w-[100px] shadow-[0_3px_0_#06100e]">
+                  <span className="text-[9px] font-black text-[#48b878] uppercase tracking-wider block">
+                    NO CAMPO
                   </span>
-                  <span className="text-2xl font-black text-white font-mono">
+                  <span className="text-xl font-black text-white font-mono">
                     {filteredPokemon.length}
                   </span>
                 </div>
 
                 <div
                   onClick={() => setIsTeamDrawerOpen(true)}
-                  className="p-4 rounded-2xl bg-gradient-to-br from-red-950/80 to-[#122824] border-2 border-red-500/50 text-center min-w-[120px] cursor-pointer hover:border-red-400 transition-all group shadow-lg"
+                  className="p-3.5 rounded-sm bg-[#1a3832] border-2 border-[#d83828] text-center min-w-[120px] cursor-pointer hover:bg-[#244840] shadow-[0_3px_0_#881810] active:translate-y-0.5 active:shadow-none transition-all group"
                 >
-                  <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider block group-hover:text-red-300">
-                    Seu Time
+                  <span className="text-[9px] font-black text-[#f8d030] uppercase tracking-wider block group-hover:text-amber-300">
+                    [START] SEU TIME
                   </span>
-                  <span className="text-2xl font-black text-white font-mono flex items-center justify-center gap-1">
-                    {team.length}<span className="text-slate-400 text-sm">/6</span>
+                  <span className="text-xl font-black text-white font-mono flex items-center justify-center gap-1">
+                    {team.length}<span className="text-[#a0c0b8] text-xs">/6</span>
                   </span>
                 </div>
               </div>

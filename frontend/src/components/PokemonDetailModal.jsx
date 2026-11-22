@@ -142,13 +142,6 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
 
   const getStatPercent = (val) => Math.min(100, Math.round((val / 200) * 100));
 
-  const getStatColor = (val) => {
-    if (val >= 130) return 'bg-[#28b878]';
-    if (val >= 90) return 'bg-[#3898f8]';
-    if (val >= 60) return 'bg-[#f8a828]';
-    return 'bg-[#d83828]';
-  };
-
   const pokemonName = detail?.name || initialPokemon?.name || `Pokemon #${pokemonId}`;
   const formattedId = String(pokemonId).padStart(3, '0');
 
@@ -160,35 +153,35 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto bg-black/85 backdrop-blur-sm select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 overflow-y-auto bg-black/85 backdrop-blur-sm select-none animate-fadeIn">
       {/* Backdrop click to close */}
       <div className="fixed inset-0" onClick={onClose} />
 
-      {/* Caixa Principal da Tela de Status estilo GBA (Pokémon FireRed / Emerald) */}
+      {/* Caixa Principal da Tela de Status estilo GBA (Ampla e Proporcional) */}
       <div
-        className="relative w-full max-w-2xl bg-[#3da496] border-4 border-[#0c2e28] rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.8),inset_0_2px_0_#68c8bc,inset_0_-2px_0_#20645c] overflow-hidden z-10 flex flex-col my-auto"
+        className="relative w-full max-w-4xl bg-[#3da496] border-4 border-[#0c2e28] rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_2px_0_#68c8bc,inset_0_-2px_0_#20645c] overflow-hidden z-10 flex flex-col my-auto"
         style={{
-          boxShadow: 'inset 0 0 0 2px #50b0a2, 0 15px 35px rgba(0, 0, 0, 0.75)',
+          boxShadow: 'inset 0 0 0 2px #50b0a2, 0 20px 45px rgba(0, 0, 0, 0.8)',
         }}
       >
         {/* Barra Superior estilo GBA (POKÉMON INFO / +PAGE / CANCEL) */}
-        <div className="relative px-3 sm:px-4 py-2.5 bg-[#3da496] border-b-2 border-[#1a5048] flex items-center justify-between shadow-sm">
+        <div className="relative px-3 sm:px-5 py-3 bg-[#3da496] border-b-2 border-[#1a5048] flex items-center justify-between shadow-sm">
           {/* Lado Esquerdo: Indicador Oval + Dots + Título GBA */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             {/* Cápsula Oval luminosa retrô */}
-            <div className="w-3.5 h-6 rounded-full bg-[#f8faf8] border-2 border-[#1c4840] shadow-inner flex items-center justify-center">
-              <div className="w-1.5 h-3 rounded-full bg-[#b8d4d0]/60" />
+            <div className="w-4 h-7 rounded-full bg-[#f8faf8] border-2 border-[#1c4840] shadow-inner flex items-center justify-center">
+              <div className="w-1.5 h-3.5 rounded-full bg-[#b8d4d0]/70" />
             </div>
 
             {/* Dois pontinhos/botões azuis do GBA */}
             <div className="flex flex-col gap-1">
-              <div className="w-2 h-2 rounded-full bg-[#185868] border border-[#308898]" />
-              <div className="w-2 h-2 rounded-full bg-[#185868] border border-[#308898]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#185868] border border-[#308898]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#185868] border border-[#308898]" />
             </div>
 
             {/* Título da tela com drop-shadow pixelado */}
             <h2
-              className="text-xs sm:text-sm font-black text-white tracking-widest pl-1"
+              className="text-xs sm:text-base font-black text-white tracking-widest pl-1"
               style={{
                 textShadow: '2px 2px 0px #18443e, -1px -1px 0px #18443e',
               }}
@@ -197,12 +190,12 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
             </h2>
           </div>
 
-          {/* Lado Direito: Botões +PAGE e (A)CANCEL */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Lado Direito: Botões +PAGE e (A)CANCEL com estilo de controle retrô */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={handleNextPage}
               title="Trocar página (ou use as setas ← → do teclado)"
-              className="px-2 sm:px-2.5 py-1 text-[9px] sm:text-[10px] font-black rounded-sm bg-[#e8ece8] hover:bg-white text-[#183830] border-2 border-[#184840] shadow-[0_2px_0_#14342e] active:translate-y-0.5 active:shadow-none flex items-center gap-1 cursor-pointer transition-all"
+              className="px-2.5 sm:px-3 py-1.5 text-[10px] sm:text-xs font-black rounded-sm bg-[#e8ece8] hover:bg-white text-[#183830] border-2 border-[#184840] shadow-[0_3px_0_#14342e] active:translate-y-0.5 active:shadow-none flex items-center gap-1.5 cursor-pointer transition-all"
             >
               <span className="text-[#388878] font-black">+</span>
               <span>PAGE</span>
@@ -211,22 +204,24 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
             <button
               onClick={onClose}
               title="Fechar (Esc)"
-              className="px-2 sm:px-2.5 py-1 text-[9px] sm:text-[10px] font-black rounded-sm bg-[#e8ece8] hover:bg-[#fedcd0] text-[#881810] border-2 border-[#184840] shadow-[0_2px_0_#14342e] active:translate-y-0.5 active:shadow-none flex items-center gap-1 cursor-pointer transition-all"
+              className="px-2.5 sm:px-3 py-1.5 text-[10px] sm:text-xs font-black rounded-sm bg-[#e8ece8] hover:bg-[#fedcd0] text-[#881810] border-2 border-[#184840] shadow-[0_3px_0_#14342e] active:translate-y-0.5 active:shadow-none flex items-center gap-1.5 cursor-pointer transition-all"
             >
-              <span className="text-[#d83828] font-black">A</span>
+              <span className="w-3.5 h-3.5 rounded-full bg-[#d83828] text-white flex items-center justify-center text-[9px] font-black">
+                A
+              </span>
               <span>CANCEL</span>
             </button>
           </div>
         </div>
 
         {/* Abas Rápidas de Navegação das Páginas do GBA */}
-        <div className="flex items-center gap-1 px-3 py-1 bg-[#28746a] border-b-2 border-[#184840] text-[9px] sm:text-[10px] overflow-x-auto">
-          <span className="text-[#a4e0d4] mr-1 hidden sm:inline font-bold">TELA:</span>
+        <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#28746a] border-b-2 border-[#184840] text-[10px] sm:text-xs overflow-x-auto">
+          <span className="text-[#a4e0d4] mr-1 hidden sm:inline font-bold">PÁGINA:</span>
           <button
             onClick={() => setActiveTab('info')}
-            className={`px-2 py-0.5 rounded-sm border cursor-pointer font-bold transition-all ${
+            className={`px-3 py-1 rounded-sm border cursor-pointer font-bold transition-all ${
               activeTab === 'info'
-                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm'
+                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm font-black'
                 : 'bg-[#1e5850] text-[#b8e8dc] border-[#16443c] hover:bg-[#28685c]'
             }`}
           >
@@ -234,9 +229,9 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
           </button>
           <button
             onClick={() => setActiveTab('status')}
-            className={`px-2 py-0.5 rounded-sm border cursor-pointer font-bold transition-all ${
+            className={`px-3 py-1 rounded-sm border cursor-pointer font-bold transition-all ${
               activeTab === 'status'
-                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm'
+                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm font-black'
                 : 'bg-[#1e5850] text-[#b8e8dc] border-[#16443c] hover:bg-[#28685c]'
             }`}
           >
@@ -244,9 +239,9 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
           </button>
           <button
             onClick={() => setActiveTab('fraquezas')}
-            className={`px-2 py-0.5 rounded-sm border cursor-pointer font-bold transition-all ${
+            className={`px-3 py-1 rounded-sm border cursor-pointer font-bold transition-all ${
               activeTab === 'fraquezas'
-                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm'
+                ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-sm font-black'
                 : 'bg-[#1e5850] text-[#b8e8dc] border-[#16443c] hover:bg-[#28685c]'
             }`}
           >
@@ -255,12 +250,12 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
         </div>
 
         {/* Corpo da Tela GBA */}
-        <div className="p-2.5 sm:p-3.5 space-y-2.5 sm:space-y-3 bg-[#3da496] max-h-[82vh] overflow-y-auto">
+        <div className="p-3 sm:p-5 space-y-3 sm:space-y-4 bg-[#3da496] max-h-[84vh] overflow-y-auto">
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center gap-3 bg-[#fff8f0] border-2 border-[#c87868] rounded-sm p-8">
-              <div className="w-8 h-8 border-4 border-[#388878] border-t-transparent rounded-full animate-spin" />
-              <p className="text-[11px] font-bold text-[#1c3830] tracking-wider">
-                LENDO CARTUCHO...
+            <div className="py-24 flex flex-col items-center justify-center gap-3 bg-[#fff8f0] border-2 border-[#c87868] rounded-sm p-8">
+              <div className="w-10 h-10 border-4 border-[#388878] border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs font-bold text-[#1c3830] tracking-wider">
+                LENDO DADOS DO POKÉMON...
               </p>
             </div>
           ) : error ? (
@@ -270,44 +265,45 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
           ) : (
             <>
               {/* Seção Superior: Caixa Lilás do Sprite (Esquerda) e Painel Listrado Pêssego (Direita) */}
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-stretch">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 items-stretch">
                 
-                {/* === COLUNA ESQUERDA: QUADRO DO POKÉMON COM SPRITE GIGANTE (FRLG) === */}
-                <div className="sm:col-span-5 flex flex-col">
+                {/* === COLUNA ESQUERDA: QUADRO DO POKÉMON COM SPRITE GIGANTE ENCOSTANDO NA SOMBRA === */}
+                <div className="md:col-span-5 flex flex-col">
                   {/* Faixa Roxa/Lilás com Nível e Nome */}
-                  <div className="bg-[#8078b8] border-t-2 border-x-2 border-[#585088] rounded-t-sm px-2.5 py-1.5 flex items-center justify-between text-white shadow-sm">
-                    <span className="text-[10px] font-black tracking-wider text-[#fcfcff]">
+                  <div className="bg-[#8078b8] border-t-2 border-x-2 border-[#585088] rounded-t-sm px-3 py-2 flex items-center justify-between text-white shadow-sm">
+                    <span className="text-xs font-black tracking-wider text-[#fcfcff]">
                       Lv50
                     </span>
-                    <span className="text-[10px] font-black tracking-wider uppercase text-white truncate max-w-[100px]">
+                    <span className="text-xs sm:text-sm font-black tracking-wider uppercase text-white truncate max-w-[140px]">
                       {pokemonName}
                     </span>
                     {/* Símbolo de Gênero estilo GBA */}
-                    <span className="text-[11px] font-extrabold text-[#2858b8] drop-shadow-[0_1px_0_#ffffff]">
+                    <span className="text-xs sm:text-sm font-extrabold text-[#2858b8] drop-shadow-[0_1px_0_#ffffff]">
                       ♂
                     </span>
                   </div>
 
-                  {/* Quadro Branco com Listras Horizontais Sutis + Sprite GRANDE em Pixel Art */}
+                  {/* Quadro Branco com Listras Horizontais Sutis + SPRITE GRANDE ENCOSTADO NA SOMBRA */}
                   <div
-                    className="relative flex-1 min-h-[190px] sm:min-h-[210px] flex items-center justify-center border-2 border-[#585088] overflow-hidden"
+                    className="relative flex-1 min-h-[250px] sm:min-h-[280px] h-64 sm:h-72 border-2 border-[#585088] overflow-hidden flex flex-col items-center justify-end pb-3 sm:pb-4"
                     style={{
                       background:
                         'repeating-linear-gradient(to bottom, #ffffff 0px, #ffffff 3px, #e8edf0 3px, #e8edf0 6px)',
                     }}
                   >
-                    {/* Sombra / Pedestal oval da batalha sob o Pokémon */}
-                    <div className="absolute bottom-4 w-32 sm:w-36 h-7 rounded-[100%] bg-[#b8c8c0]/70 border border-[#98a8a0] shadow-inner pointer-events-none" />
+                    {/* Sombra / Pedestal oval da batalha sob os pés do Pokémon */}
+                    <div className="absolute bottom-3 sm:bottom-4 w-44 sm:w-56 h-8 sm:h-9 rounded-[100%] bg-[#98a8a0]/80 border-2 border-[#788880] shadow-inner pointer-events-none" />
 
-                    {/* SPRITE DO POKÉMON: Grande, Nítido e Animado em Pixel Art */}
-                    <div className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center">
+                    {/* SPRITE DO POKÉMON: Ancorado na base para ENCOSTAR DIRETAMENTE NA SOMBRA */}
+                    <div className="relative z-10 flex items-end justify-center -mb-2 sm:-mb-3">
                       <img
                         src={get2DAnimatedSpriteUrl(pokemonId, isShiny)}
                         alt={pokemonName}
                         style={{
                           imageRendering: 'pixelated',
+                          transformOrigin: 'bottom center',
                         }}
-                        className="max-h-36 max-w-36 sm:max-h-44 sm:max-w-44 object-contain scale-[1.75] sm:scale-[2.0] transform-gpu filter drop-shadow-md select-none pointer-events-none"
+                        className="w-48 h-48 sm:w-56 sm:h-56 object-contain scale-[2.2] sm:scale-[2.6] select-none pointer-events-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]"
                       />
                     </div>
 
@@ -316,23 +312,23 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                       src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
                       alt="Pokéball"
                       style={{ imageRendering: 'pixelated' }}
-                      className="absolute bottom-2 right-2 w-5 h-5 object-contain opacity-95 drop-shadow pointer-events-none"
+                      className="absolute bottom-2.5 right-2.5 w-6 h-6 object-contain opacity-95 drop-shadow pointer-events-none"
                     />
                   </div>
 
-                  {/* Botões de Ação do Sprite: Som (Cry), Shiny e Time (SEM botão de Arte) */}
-                  <div className="flex items-center justify-between gap-1.5 mt-2">
+                  {/* Botões Retrô de Ação do Sprite: SOM, SHINY e TIME (Estilo GBA sem Arte) */}
+                  <div className="flex items-center justify-between gap-2 mt-2.5">
                     {/* Botão de Som (Cry) */}
                     <button
                       onClick={playCry}
                       title="Tocar Som oficial (Cry)"
-                      className={`flex-1 py-1.5 px-1 rounded-sm text-[9px] font-black flex items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
+                      className={`flex-1 py-2 px-1.5 rounded-sm text-[10px] sm:text-xs font-black flex items-center justify-center gap-1.5 border-2 transition-all cursor-pointer ${
                         isPlayingAudio
-                          ? 'bg-[#d83828] text-white border-[#881810] animate-pulse'
-                          : 'bg-[#eef2ee] hover:bg-white text-[#183828] border-[#688878] shadow-[0_2px_0_#486054] active:translate-y-0.5 active:shadow-none'
+                          ? 'bg-[#d83828] text-white border-[#881810] animate-pulse shadow-[0_3px_0_#501008]'
+                          : 'bg-[#eef2ee] hover:bg-white text-[#183828] border-[#688878] shadow-[0_3px_0_#486054] active:translate-y-0.5 active:shadow-none'
                       }`}
                     >
-                      <Volume2 className="w-3 h-3 text-[#d83828]" />
+                      <Volume2 className="w-3.5 h-3.5 text-[#d83828]" />
                       <span>SOM</span>
                     </button>
 
@@ -340,13 +336,13 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                     <button
                       onClick={() => setIsShiny(!isShiny)}
                       title="Alternar versão Shiny"
-                      className={`flex-1 py-1.5 px-1 rounded-sm text-[9px] font-black flex items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
+                      className={`flex-1 py-2 px-1.5 rounded-sm text-[10px] sm:text-xs font-black flex items-center justify-center gap-1.5 border-2 transition-all cursor-pointer ${
                         isShiny
-                          ? 'bg-[#f8c830] text-[#381c00] border-[#986808] shadow-[0_2px_0_#684000]'
-                          : 'bg-[#eef2ee] hover:bg-white text-[#183828] border-[#688878] shadow-[0_2px_0_#486054] active:translate-y-0.5 active:shadow-none'
+                          ? 'bg-[#f8c830] text-[#381c00] border-[#986808] shadow-[0_3px_0_#684000]'
+                          : 'bg-[#eef2ee] hover:bg-white text-[#183828] border-[#688878] shadow-[0_3px_0_#486054] active:translate-y-0.5 active:shadow-none'
                       }`}
                     >
-                      <Sparkles className="w-3 h-3 text-[#d89810]" />
+                      <Sparkles className="w-3.5 h-3.5 text-[#d89810]" />
                       <span>SHINY</span>
                     </button>
 
@@ -354,7 +350,7 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                     <button
                       onClick={handleTeamAction}
                       title={inTeam ? 'Remover da equipe' : 'Adicionar à equipe'}
-                      className={`flex-1 py-1.5 px-1 rounded-sm text-[9px] font-black flex items-center justify-center gap-1 border-2 transition-all cursor-pointer shadow-[0_2px_0_rgba(0,0,0,0.3)] active:translate-y-0.5 active:shadow-none ${
+                      className={`flex-1 py-2 px-1.5 rounded-sm text-[10px] sm:text-xs font-black flex items-center justify-center gap-1.5 border-2 transition-all cursor-pointer shadow-[0_3px_0_rgba(0,0,0,0.35)] active:translate-y-0.5 active:shadow-none ${
                         inTeam
                           ? 'bg-[#d84838] hover:bg-[#e85848] text-white border-[#881810]'
                           : 'bg-[#38a868] hover:bg-[#48b878] text-white border-[#186838]'
@@ -362,12 +358,12 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                     >
                       {inTeam ? (
                         <>
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-3.5 h-3.5" />
                           <span>-TIME</span>
                         </>
                       ) : (
                         <>
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                           <span>+TIME</span>
                         </>
                       )}
@@ -377,7 +373,7 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
 
                 {/* === COLUNA DIREITA: DADOS ESPECÍFICOS DA PÁGINA (FRLG ESTILO PÊSSEGO) === */}
                 <div
-                  className="sm:col-span-7 p-2.5 sm:p-3 border-2 border-[#d08878] rounded-sm flex flex-col justify-between"
+                  className="md:col-span-7 p-3 sm:p-4 border-2 border-[#d08878] rounded-sm flex flex-col justify-between"
                   style={{
                     background:
                       'repeating-linear-gradient(to bottom, #fff5f0 0px, #fff5f0 3px, #fed8cb 3px, #fed8cb 6px)',
@@ -385,40 +381,40 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                 >
                   {/* CONTEÚDO DA PÁGINA 1: INFO (EXATAMENTE IGUAL À IMAGEM DE REFERÊNCIA) */}
                   {activeTab === 'info' && (
-                    <div className="space-y-2">
+                    <div className="space-y-2.5 sm:space-y-3">
                       {/* Linha No */}
                       <div className="flex items-center gap-3">
-                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                        <span className="w-20 px-2.5 py-1 rounded-sm bg-[#687890] border border-[#485870] text-white text-[10px] sm:text-xs font-black text-center shadow-sm">
                           No
                         </span>
-                        <span className="text-xs sm:text-sm font-black text-[#182838] tracking-wider">
+                        <span className="text-sm sm:text-base font-black text-[#182838] tracking-wider">
                           {formattedId}
                         </span>
                       </div>
 
                       {/* Linha NAME */}
                       <div className="flex items-center gap-3">
-                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                        <span className="w-20 px-2.5 py-1 rounded-sm bg-[#687890] border border-[#485870] text-white text-[10px] sm:text-xs font-black text-center shadow-sm">
                           NAME
                         </span>
-                        <span className="text-xs sm:text-sm font-black text-[#182838] uppercase tracking-wide truncate">
+                        <span className="text-sm sm:text-base font-black text-[#182838] uppercase tracking-wide truncate">
                           {pokemonName}
                         </span>
                       </div>
 
                       {/* Linha TYPE */}
                       <div className="flex items-center gap-3">
-                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                        <span className="w-20 px-2.5 py-1 rounded-sm bg-[#687890] border border-[#485870] text-white text-[10px] sm:text-xs font-black text-center shadow-sm">
                           TYPE
                         </span>
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                        <div className="flex items-center gap-2 flex-wrap">
                           {detail?.types?.map((t) => {
                             const tc = POKEMON_TYPES[t] || POKEMON_TYPES.normal;
                             return (
                               <span
                                 key={t}
                                 style={{ backgroundColor: tc.color }}
-                                className="px-2 py-0.5 rounded-sm text-[9px] sm:text-[10px] font-black text-white uppercase border border-black/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.3)]"
+                                className="px-3 py-1 rounded-sm text-[10px] sm:text-xs font-black text-white uppercase border border-black/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.3)]"
                               >
                                 {tc.name}
                               </span>
@@ -429,33 +425,33 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
 
                       {/* Linha OT / ALTURA */}
                       <div className="flex items-center gap-3">
-                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                        <span className="w-20 px-2.5 py-1 rounded-sm bg-[#687890] border border-[#485870] text-white text-[10px] sm:text-xs font-black text-center shadow-sm">
                           ALTURA
                         </span>
-                        <span className="text-xs sm:text-sm font-black text-[#182838]">
+                        <span className="text-sm sm:text-base font-black text-[#182838]">
                           {detail?.height} m
                         </span>
                       </div>
 
                       {/* Linha IDNo / PESO */}
                       <div className="flex items-center gap-3">
-                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                        <span className="w-20 px-2.5 py-1 rounded-sm bg-[#687890] border border-[#485870] text-white text-[10px] sm:text-xs font-black text-center shadow-sm">
                           PESO
                         </span>
-                        <span className="text-xs sm:text-sm font-black text-[#182838]">
+                        <span className="text-sm sm:text-base font-black text-[#182838]">
                           {detail?.weight} kg
                         </span>
                       </div>
 
                       {/* Linha ITEM / HABILIDADE */}
                       <div className="flex items-center gap-3">
-                        <span className="w-16 px-2 py-0.5 rounded-sm bg-[#687890] border border-[#485870] text-white text-[9px] sm:text-[10px] font-black text-center shadow-sm">
+                        <span className="w-20 px-2.5 py-1 rounded-sm bg-[#687890] border border-[#485870] text-white text-[10px] sm:text-xs font-black text-center shadow-sm">
                           HABILIDADE
                         </span>
-                        <div className="text-[10px] sm:text-[11px] font-black text-[#182838] uppercase truncate">
+                        <div className="text-xs sm:text-sm font-black text-[#182838] uppercase truncate">
                           {capitalize(detail?.abilities?.[0]?.name?.replace('-', ' ') || 'NENHUMA')}
                           {detail?.abilities?.[0]?.isHidden && (
-                            <span className="ml-1 text-[8px] text-[#702888]">
+                            <span className="ml-1 text-[9px] text-[#702888]">
                               (OCULTA)
                             </span>
                           )}
@@ -466,13 +462,13 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
 
                   {/* CONTEÚDO DA PÁGINA 2: STATUS (POKÉMON SKILLS ESTILO GBA) */}
                   {activeTab === 'status' && (
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between pb-1 border-b border-[#e09888]">
-                        <span className="text-[10px] font-black text-[#182838]">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-[#e09888]">
+                        <span className="text-xs font-black text-[#182838]">
                           ATRIBUTOS BASE
                         </span>
-                        <span className="text-[10px] font-black text-[#d83828]">
-                          BST: {detail?.stats?.total}
+                        <span className="text-xs font-black text-[#d83828]">
+                          BST TOTAL: {detail?.stats?.total}
                         </span>
                       </div>
 
@@ -485,11 +481,11 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                         { label: 'VELOC.', val: detail?.stats?.speed, color: '#8858b8' },
                       ].map((st) => (
                         <div key={st.label} className="space-y-0.5">
-                          <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-black">
+                          <div className="flex items-center justify-between text-[10px] sm:text-xs font-black">
                             <span className="text-[#384858]">{st.label}</span>
                             <span className="text-[#182838] font-mono">{st.val}</span>
                           </div>
-                          <div className="w-full h-1.5 bg-[#e0cece] rounded-none border border-[#b89898] overflow-hidden">
+                          <div className="w-full h-2 bg-[#e0cece] rounded-none border border-[#b89898] overflow-hidden">
                             <div
                               className="h-full"
                               style={{
@@ -505,12 +501,12 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
 
                   {/* CONTEÚDO DA PÁGINA 3: EFICÁCIA E FRAQUEZAS */}
                   {activeTab === 'fraquezas' && (
-                    <div className="space-y-2 text-[9px] sm:text-[10px]">
+                    <div className="space-y-2.5 text-[10px] sm:text-xs">
                       <div>
                         <span className="font-black text-[#b82818] block mb-1">
                           FRAQUEZAS (DANO AUMENTADO):
                         </span>
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1.5">
                           {weaknesses.length === 0 ? (
                             <span className="text-[#586878]">Nenhuma fraqueza</span>
                           ) : (
@@ -520,7 +516,7 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                                 <span
                                   key={type}
                                   style={{ backgroundColor: tc.color }}
-                                  className="px-1.5 py-0.5 rounded-sm text-white font-black text-[9px] border border-black/20 flex items-center gap-1"
+                                  className="px-2 py-0.5 rounded-sm text-white font-black text-[10px] border border-black/20 flex items-center gap-1 shadow-sm"
                                 >
                                   {tc.name}
                                   <span className="bg-black/30 px-1 rounded-sm text-white">
@@ -533,11 +529,11 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                         </div>
                       </div>
 
-                      <div className="pt-1.5 border-t border-[#e09888]">
+                      <div className="pt-2 border-t border-[#e09888]">
                         <span className="font-black text-[#187838] block mb-1">
                           RESISTÊNCIAS (DANO REDUZIDO):
                         </span>
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1.5">
                           {resistances.length === 0 ? (
                             <span className="text-[#586878]">Nenhuma resistência</span>
                           ) : (
@@ -547,7 +543,7 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                                 <span
                                   key={type}
                                   style={{ backgroundColor: tc.color }}
-                                  className="px-1.5 py-0.5 rounded-sm text-white font-black text-[9px] border border-black/20 flex items-center gap-1"
+                                  className="px-2 py-0.5 rounded-sm text-white font-black text-[10px] border border-black/20 flex items-center gap-1 shadow-sm"
                                 >
                                   {tc.name}
                                   <span className="bg-black/30 px-1 rounded-sm text-white">
@@ -561,18 +557,18 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
                       </div>
 
                       {immunities.length > 0 && (
-                        <div className="pt-1.5 border-t border-[#e09888]">
+                        <div className="pt-2 border-t border-[#e09888]">
                           <span className="font-black text-[#582888] block mb-1">
                             IMUNIDADES (0x):
                           </span>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1.5">
                             {immunities.map(({ type }) => {
                               const tc = POKEMON_TYPES[type] || POKEMON_TYPES.normal;
                               return (
                                 <span
                                   key={type}
                                   style={{ backgroundColor: tc.color }}
-                                  className="px-1.5 py-0.5 rounded-sm text-white font-black text-[9px] border border-black/20"
+                                  className="px-2 py-0.5 rounded-sm text-white font-black text-[10px] border border-black/20 shadow-sm"
                                 >
                                   {tc.name} 0x
                                 </span>
@@ -590,29 +586,29 @@ export default function PokemonDetailModal({ pokemonId, initialPokemon, onClose 
               <div>
                 {/* Aba de Cabeçalho TRAINER MEMO */}
                 <div className="flex items-center">
-                  <span className="px-2.5 py-1 rounded-t-sm bg-[#687890] border-t-2 border-x-2 border-[#485870] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-sm">
+                  <span className="px-3 py-1 rounded-t-sm bg-[#687890] border-t-2 border-x-2 border-[#485870] text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-sm">
                     TRAINER MEMO
                   </span>
                 </div>
 
                 {/* Caixa de Texto estilo Pergaminho / Memo GBA com Listras Horizontais */}
                 <div
-                  className="p-3 border-2 border-[#d08878] rounded-b-sm rounded-tr-sm text-[#182838]"
+                  className="p-3.5 sm:p-4 border-2 border-[#d08878] rounded-b-sm rounded-tr-sm text-[#182838]"
                   style={{
                     background:
                       'repeating-linear-gradient(to bottom, #fffaf4 0px, #fffaf4 4px, #fcece0 4px, #fcece0 8px)',
                   }}
                 >
                   {/* Linha de Natureza / Local (estilo FireRed) */}
-                  <p className="text-[10px] sm:text-[11px] font-black text-[#284858] mb-1">
+                  <p className="text-xs sm:text-sm font-black text-[#284858] mb-1">
                     {species?.genus ? `${species.genus.toUpperCase()} nature.` : 'DOCILE nature.'}
                   </p>
-                  <p className="text-[10px] sm:text-[11px] font-bold text-[#486070] mb-2">
+                  <p className="text-xs sm:text-sm font-bold text-[#486070] mb-2.5">
                     Met in PALLET TOWN at Lv 5.
                   </p>
 
                   {/* Texto de Descrição da Pokédex */}
-                  <p className="text-[10px] sm:text-[11px] leading-relaxed text-[#182838] font-bold">
+                  <p className="text-xs sm:text-sm leading-relaxed text-[#182838] font-bold">
                     "{species?.flavorText || 'A strange seed was planted on its back at birth. The plant sprouts and grows with this POKÉMON.'}"
                   </p>
                 </div>

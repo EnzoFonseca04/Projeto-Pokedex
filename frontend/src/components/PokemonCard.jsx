@@ -133,45 +133,45 @@ export default function PokemonCard({
             )}
           </div>
 
-          <div className="flex items-center gap-1">
-            {/* Botão de Som oficial (Cry) */}
+          <div className="flex items-center gap-1.5">
+            {/* Botão de Som oficial (Cry) Retrô */}
             <button
               onClick={handlePlayCry}
               title="Ouvir som (Cry)"
-              className="p-1 rounded-md bg-white/70 hover:bg-white text-slate-700 hover:text-red-600 transition-colors shadow-sm"
+              className="p-1 rounded-sm bg-[#eef2ee] hover:bg-white text-[#183828] border border-[#688878] shadow-[0_1.5px_0_#486054] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
             >
-              <Volume2 className="w-3.5 h-3.5" />
+              <Volume2 className="w-3 h-3 text-[#d83828]" />
             </button>
 
-            {/* Quick Add ao Time */}
+            {/* Quick Add ao Time Retrô */}
             <button
               onClick={handleQuickAdd}
               disabled={inTeam}
               title={inTeam ? 'Já está no time' : 'Adicionar ao time (+)'}
-              className={`px-1.5 py-0.5 rounded-md text-[9px] font-extrabold flex items-center gap-1 transition-all shadow-sm ${
+              className={`px-1.5 py-0.5 rounded-sm text-[8px] sm:text-[9px] font-black flex items-center gap-1 transition-all cursor-pointer shadow-[0_1.5px_0_rgba(0,0,0,0.3)] active:translate-y-0.5 active:shadow-none border ${
                 inTeam
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white/80 hover:bg-red-600 text-slate-800 hover:text-white'
+                  ? 'bg-[#38a868] text-white border-[#185830]'
+                  : 'bg-[#eef2ee] hover:bg-[#f8d030] text-[#183828] hover:text-[#381c00] border-[#688878] hover:border-[#987008]'
               }`}
             >
               {inTeam ? (
                 <>
                   <Check className="w-2.5 h-2.5" />
-                  <span className="hidden sm:inline">Time</span>
+                  <span>TIME</span>
                 </>
               ) : (
                 <>
                   <Plus className="w-2.5 h-2.5" />
-                  <span>+</span>
+                  <span>TIME</span>
                 </>
               )}
             </button>
 
             <span
-              className="text-slate-500 hover:text-slate-800 cursor-grab active:cursor-grabbing p-0.5"
+              className="text-slate-600 hover:text-slate-900 cursor-grab active:cursor-grabbing p-0.5"
               title="Arraste para o Team Builder"
             >
-              <GripVertical className="w-3.5 h-3.5" />
+              <GripVertical className="w-3 h-3" />
             </span>
           </div>
         </div>

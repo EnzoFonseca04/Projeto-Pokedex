@@ -27,13 +27,13 @@ export default function TypeFilters({ selectedType, onSelectType }) {
       <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none no-scrollbar">
         <button
           onClick={() => onSelectType(null)}
-          className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+          className={`shrink-0 px-3 py-1.5 rounded-sm text-[10px] sm:text-xs font-black transition-all border-2 cursor-pointer shadow-[0_2px_0_rgba(0,0,0,0.3)] active:translate-y-0.5 active:shadow-none ${
             selectedType === null
-              ? 'bg-slate-200 text-slate-900 border-white shadow-md'
-              : 'bg-slate-900/60 text-slate-400 hover:text-slate-200 border-slate-800'
+              ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050]'
+              : 'bg-[#122824] text-[#a0d0c4] hover:text-white border-[#244840]'
           }`}
         >
-          Todos
+          TODOS
         </button>
 
         {typeKeys.map((typeKey) => {
@@ -46,19 +46,19 @@ export default function TypeFilters({ selectedType, onSelectType }) {
               onClick={() => onSelectType(isSelected ? null : typeKey)}
               style={{
                 backgroundColor: isSelected ? typeData.color : undefined,
-                borderColor: isSelected ? 'rgba(255,255,255,0.4)' : undefined,
+                borderColor: isSelected ? '#ffffff' : undefined,
               }}
-              className={`shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 ${
+              className={`shrink-0 px-2.5 py-1.5 rounded-sm text-[10px] sm:text-xs font-black transition-all border-2 flex items-center gap-1.5 cursor-pointer shadow-[0_2px_0_rgba(0,0,0,0.3)] active:translate-y-0.5 active:shadow-none ${
                 isSelected
-                  ? 'text-white shadow-lg ring-2 ring-white/20 scale-105'
-                  : 'bg-slate-900/60 text-slate-400 hover:text-white border-slate-800/80 hover:border-slate-700'
+                  ? 'text-white shadow-md ring-1 ring-white scale-105'
+                  : 'bg-[#122824] text-[#a0d0c4] hover:text-white border-[#244840]'
               }`}
             >
               <span
-                className="w-2 h-2 rounded-full"
+                className="w-2 h-2 rounded-full border border-black/30"
                 style={{ backgroundColor: typeData.color }}
               ></span>
-              <span>{typeData.name}</span>
+              <span className="uppercase">{typeData.name}</span>
             </button>
           );
         })}

@@ -3,7 +3,6 @@ import { useTeam } from '../context/TeamContext';
 import { POKEMON_TYPES } from '../data/types';
 import { formatPokemonId, capitalize } from '../services/pokeApi';
 import {
-  X,
   Trash2,
   Share2,
   Dices,
@@ -12,8 +11,6 @@ import {
   Activity,
   GripVertical,
   Plus,
-  Sparkles,
-  Layers,
 } from 'lucide-react';
 import ExportModal from './ExportModal';
 
@@ -107,107 +104,126 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Slide-in Lateral Panel */}
-      <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col animate-slideLeft">
+      {/* Slide-in Lateral Panel estilo GBA FireRed / Emerald PC Box */}
+      <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-[#122824] border-l-4 border-[#0c1e1a] shadow-[0_0_50px_rgba(0,0,0,0.85)] flex flex-col animate-slideLeft select-none">
         
-        {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 flex items-center justify-center text-white shadow-lg shadow-red-600/20">
-              <span className="font-black text-sm">6</span>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-extrabold text-white">Team Builder</h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-400 border border-red-500/30">
-                  {team.length}/6 Pokémon
-                </span>
-              </div>
-              <p className="text-xs text-slate-400">
-                Monte, organize e analise sua equipe
-              </p>
-            </div>
+        {/* Cabeçalho Retrô Estilo Barra GBA Fame Checker */}
+        <div className="relative bg-[#2054c8] border-b-2 border-[#0e1c38] flex items-stretch overflow-hidden min-h-[58px]">
+          {/* Aba Laranja com Corte Diagonal */}
+          <div
+            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[#ea7028] to-[#f89848] border-r-2 border-[#984010] shrink-0"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%)',
+              paddingRight: '1.5rem',
+            }}
+          >
+            <span
+              className="text-xs sm:text-sm font-black text-white tracking-wider uppercase"
+              style={{
+                textShadow: '2px 2px 0px #803008',
+              }}
+            >
+              EQUIPE
+            </span>
+            <span className="px-1.5 py-0.2 rounded-sm bg-[#f8d030] text-[#381c00] text-[9px] font-black border border-[#a07008]">
+              {team.length}/6
+            </span>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {/* Área Azul com Botão de Fechar Retrô [B] SAIR */}
+          <div className="flex-1 flex items-center justify-end px-3 py-2">
+            <button
+              onClick={onClose}
+              title="Fechar (Esc)"
+              className="px-2.5 py-1 text-[10px] font-black rounded-sm bg-[#e8ece8] hover:bg-[#fedcd0] text-[#881810] border-2 border-[#184840] shadow-[0_2px_0_#14342e] active:translate-y-0.5 active:shadow-none flex items-center gap-1.5 cursor-pointer transition-all"
+            >
+              <span className="w-3.5 h-3.5 rounded-full bg-[#d83828] text-white flex items-center justify-center text-[9px] font-black">
+                B
+              </span>
+              <span>SAIR</span>
+            </button>
+          </div>
         </div>
 
-        {/* Action Tabs & Quick Tools */}
-        <div className="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+        {/* Faixa Amarela GBA */}
+        <div className="h-1 bg-[#f8d030] border-b border-[#a88010]" />
+
+        {/* Barra de Ferramentas Retrô: Abas e Botões GBA */}
+        <div className="px-3 py-2 bg-[#183630] border-b-2 border-[#0e201c] flex items-center justify-between gap-2">
+          {/* Abas Retrô com Rótulos de Controle */}
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setActiveTab('slots')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-sm border-2 text-[9px] sm:text-[10px] font-black transition-all flex items-center gap-1 cursor-pointer ${
                 activeTab === 'slots'
-                  ? 'bg-slate-800 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-[0_2px_0_#485830]'
+                  : 'bg-[#102420] text-[#a0d0c4] border-[#0a1814] hover:bg-[#16302a]'
               }`}
             >
-              Slots ({team.length})
+              <span className="text-[#388878] font-black">+</span>
+              <span>SLOTS ({team.length})</span>
             </button>
             <button
               onClick={() => setActiveTab('analysis')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded-sm border-2 text-[9px] sm:text-[10px] font-black transition-all flex items-center gap-1 cursor-pointer ${
                 activeTab === 'analysis'
-                  ? 'bg-slate-800 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#fcf8d8] text-[#1c3830] border-[#889050] shadow-[0_2px_0_#485830]'
+                  : 'bg-[#102420] text-[#a0d0c4] border-[#0a1814] hover:bg-[#16302a]'
               }`}
             >
-              <Activity className="w-3.5 h-3.5 text-blue-400" />
-              <span>Análise</span>
+              <Activity className="w-3 h-3 text-[#3888f8]" />
+              <span>ANÁLISE</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-1">
+          {/* Botões de Ação Rápida Retrô ([R] Random, [START] Export, [B] Limpar) */}
+          <div className="flex items-center gap-1.5">
             <button
               onClick={handleRandomize}
-              title="Gerar Time Aleatório"
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 border border-slate-700 transition-colors"
+              title="Gerar Equipe Aleatória"
+              className="p-1.5 sm:px-2 sm:py-1 rounded-sm bg-[#e8ece8] hover:bg-white text-[#183828] border-2 border-[#587868] shadow-[0_2px_0_#385044] active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1 cursor-pointer"
             >
-              <Dices className="w-4 h-4" />
+              <Dices className="w-3.5 h-3.5 text-[#e87820]" />
+              <span className="text-[9px] font-black hidden sm:inline">RND</span>
             </button>
             <button
               onClick={() => setShowExportModal(true)}
               disabled={team.length === 0}
-              title="Exportar Time (Showdown / Texto)"
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-blue-400 border border-slate-700 transition-colors disabled:opacity-40"
+              title="Exportar Equipe (Showdown)"
+              className="p-1.5 sm:px-2 sm:py-1 rounded-sm bg-[#e8ece8] hover:bg-white text-[#183828] border-2 border-[#587868] shadow-[0_2px_0_#385044] active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1 cursor-pointer disabled:opacity-40"
             >
-              <Share2 className="w-4 h-4" />
+              <Share2 className="w-3.5 h-3.5 text-[#2060d8]" />
+              <span className="text-[9px] font-black hidden sm:inline">EXP</span>
             </button>
             <button
               onClick={clearTeam}
               disabled={team.length === 0}
-              title="Limpar todos os slots"
-              className="p-2 rounded-xl bg-slate-800 hover:bg-red-950 text-slate-400 hover:text-red-400 border border-slate-700 transition-colors disabled:opacity-40"
+              title="Limpar equipe"
+              className="p-1.5 sm:px-2 sm:py-1 rounded-sm bg-[#f8d8d4] hover:bg-[#fed0cc] text-[#881810] border-2 border-[#a84838] shadow-[0_2px_0_#682818] active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1 cursor-pointer disabled:opacity-40"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5 text-[#d83828]" />
             </button>
           </div>
         </div>
 
-        {/* Drawer Body */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {/* Corpo do Drawer com Listas de Slots */}
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2.5 bg-[#122824]">
           {activeTab === 'slots' ? (
             <>
-              {/* Instructions banner */}
-              <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-400 flex items-center gap-2.5">
-                <span className="text-red-400 text-base">💡</span>
+              {/* Dica Retrô */}
+              <div className="p-2.5 rounded-sm bg-[#1a3832] border-2 border-[#2c544a] text-[10px] text-[#b8e8dc] flex items-center gap-2">
+                <span className="text-[#f8d030] text-sm font-black">💡</span>
                 <span>
-                  <strong>Dica:</strong> Arraste cards da Pokédex diretamente para qualquer slot, ou clique em <strong>+Time</strong>.
+                  Arraste Pokémon da lista ou use <strong>+TIME</strong> no card para preencher.
                 </span>
               </div>
 
-              {/* 6 Slots Grid / List */}
-              <div className="space-y-2.5">
+              {/* 6 Slots da Equipe estilo GBA PC Box */}
+              <div className="space-y-2">
                 {Array.from({ length: 6 }).map((_, slotIndex) => {
                   const member = team[slotIndex];
                   const isDragOver = dragOverIndex === slotIndex;
@@ -225,53 +241,55 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
                         onDragOver={(e) => handleDragOver(e, slotIndex)}
                         onDragLeave={(e) => handleDragLeave(e, slotIndex)}
                         onDrop={(e) => handleDrop(e, slotIndex)}
-                        className={`group relative rounded-2xl bg-slate-800/80 border transition-all duration-200 p-2.5 flex items-center justify-between cursor-pointer select-none ${
+                        className={`group relative rounded-sm bg-[#1a3832] border-2 transition-all duration-150 p-2 flex items-center justify-between cursor-pointer select-none shadow-[0_2px_0_rgba(0,0,0,0.3)] ${
                           isDragOver
-                            ? 'border-red-500 scale-[1.02] bg-slate-800 ring-2 ring-red-500/30 shadow-lg shadow-red-500/20'
-                            : 'border-slate-700 hover:border-slate-600 shadow-md'
+                            ? 'border-[#f8d030] scale-[1.02] bg-[#224840] ring-2 ring-[#f8d030]/50'
+                            : 'border-[#38685c] hover:border-[#68b8a0]'
                         }`}
                         onClick={() => onSelectPokemonForDetail(member.id)}
                       >
                         {/* Drag Handle & Slot Number */}
                         <div className="flex items-center gap-2">
                           <span
-                            className="text-slate-500 group-hover:text-slate-300 cursor-grab active:cursor-grabbing p-1"
+                            className="text-[#689888] group-hover:text-white cursor-grab active:cursor-grabbing p-0.5"
                             title="Arraste para reordenar"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <GripVertical className="w-4 h-4" />
+                            <GripVertical className="w-3.5 h-3.5" />
                           </span>
 
-                          <span className="font-mono text-xs font-black text-slate-500 w-4">
+                          <span className="font-mono text-[10px] font-black text-[#f8d030] w-5">
                             #{slotIndex + 1}
                           </span>
 
-                          {/* Sprite */}
+                          {/* Sprite 2D com pedestal de batalha */}
                           <div
-                            className="w-12 h-12 rounded-xl bg-slate-950/80 border border-slate-700/60 p-1 flex items-center justify-center relative overflow-hidden"
+                            className="w-12 h-12 rounded-sm bg-[#0c1c18] border border-[#2c544a] flex items-center justify-center relative overflow-hidden"
                             style={{
-                              boxShadow: `0 0 15px ${typeConfig.color}20`,
+                              boxShadow: `0 0 10px ${typeConfig.color}30`,
                             }}
                           >
+                            <div className="absolute bottom-1 w-9 h-2.5 rounded-[100%] bg-emerald-900/50" />
                             <img
                               src={member.sprite}
                               alt={member.name}
-                              className="max-h-full max-w-full object-contain drop-shadow"
+                              style={{ imageRendering: 'pixelated' }}
+                              className="max-h-10 max-w-10 object-contain drop-shadow z-10"
                             />
                           </div>
 
                           {/* Info */}
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <h4 className="text-sm font-black text-white group-hover:text-red-400 transition-colors truncate max-w-[130px]">
+                              <h4 className="text-xs font-black text-white group-hover:text-[#f8d030] transition-colors uppercase truncate max-w-[130px]">
                                 {capitalize(member.name)}
                               </h4>
-                              <span className="font-mono text-[10px] font-bold text-slate-500">
+                              <span className="font-mono text-[9px] font-bold text-[#88b8a8]">
                                 {formatPokemonId(member.id)}
                               </span>
                             </div>
 
-                            {/* Type badges */}
+                            {/* Badges de Tipo Pixel Art */}
                             <div className="flex items-center gap-1 mt-1">
                               {member.types.map((t) => {
                                 const tc = POKEMON_TYPES[t] || POKEMON_TYPES.normal;
@@ -279,11 +297,9 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
                                   <span
                                     key={t}
                                     style={{
-                                      backgroundColor: `${tc.color}25`,
-                                      borderColor: `${tc.color}50`,
-                                      color: tc.color,
+                                      backgroundColor: tc.color,
                                     }}
-                                    className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase border"
+                                    className="px-1.5 py-0.2 rounded-sm text-[8px] font-black uppercase text-white border border-black/30"
                                   >
                                     {tc.name}
                                   </span>
@@ -293,55 +309,55 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
                           </div>
                         </div>
 
-                        {/* Remove Action */}
+                        {/* Botão Retrô de Remover */}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             removeFromTeam(slotIndex);
                           }}
                           title="Remover do time"
-                          className="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-slate-700/60 transition-colors"
+                          className="px-2 py-1 rounded-sm text-[9px] font-black bg-[#d83828] hover:bg-[#e84838] text-white border border-[#881810] shadow-[0_2px_0_#501008] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          X
                         </button>
                       </div>
                     );
                   }
 
-                  // Empty Slot
+                  // Empty Slot Estilo Caixa Vazia do GBA
                   return (
                     <div
                       key={`empty-${slotIndex}`}
                       onDragOver={(e) => handleDragOver(e, slotIndex)}
                       onDragLeave={(e) => handleDragLeave(e, slotIndex)}
                       onDrop={(e) => handleDrop(e, slotIndex)}
-                      className={`relative rounded-2xl border-2 border-dashed transition-all duration-200 p-4 flex items-center justify-between ${
+                      className={`relative rounded-sm border-2 border-dashed transition-all duration-150 p-3 flex items-center justify-between ${
                         isDragOver
-                          ? 'border-red-500 bg-red-500/10 scale-[1.02] ring-2 ring-red-500/30'
-                          : 'border-slate-800 bg-slate-950/40 hover:border-slate-700 hover:bg-slate-900/40'
+                          ? 'border-[#f8d030] bg-[#1a4038] scale-[1.02]'
+                          : 'border-[#284840] bg-[#0e201c] hover:border-[#3c685c]'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="font-mono text-xs font-black text-slate-600 w-4">
+                      <div className="flex items-center gap-2.5">
+                        <span className="font-mono text-[10px] font-black text-[#587868] w-5">
                           #{slotIndex + 1}
                         </span>
 
-                        <div className="w-12 h-12 rounded-xl border border-dashed border-slate-700/80 bg-slate-900/50 flex items-center justify-center text-slate-600">
-                          <Plus className="w-5 h-5" />
+                        <div className="w-10 h-10 rounded-sm border border-dashed border-[#386054] bg-[#0a1814] flex items-center justify-center text-[#587868]">
+                          <Plus className="w-4 h-4" />
                         </div>
 
                         <div>
-                          <p className="text-xs font-bold text-slate-400">
-                            Slot Disponível
+                          <p className="text-[10px] font-black text-[#98c8bc] uppercase">
+                            Slot Livre
                           </p>
-                          <p className="text-[10px] text-slate-500">
+                          <p className="text-[8px] text-[#588878]">
                             Solte um Pokémon aqui
                           </p>
                         </div>
                       </div>
 
-                      <span className="text-[10px] font-mono text-slate-600 uppercase px-2 py-1 rounded bg-slate-900 border border-slate-800">
-                        Vazio
+                      <span className="text-[8px] font-black text-[#587868] uppercase px-1.5 py-0.5 rounded-sm bg-[#0a1814] border border-[#203830]">
+                        VAZIO
                       </span>
                     </div>
                   );
@@ -350,26 +366,26 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
             </>
           ) : (
             /* Analysis Tab */
-            <div className="space-y-4">
+            <div className="space-y-3">
               {team.length === 0 ? (
-                <div className="py-12 text-center text-slate-500 text-xs font-medium">
-                  Adicione pelo menos 1 Pokémon ao time para visualizar o relatório de análise e fraquezas.
+                <div className="py-12 text-center text-[#689888] text-[10px] font-black bg-[#0e201c] p-6 rounded-sm border-2 border-[#203830]">
+                  Adicione pelo menos 1 Pokémon ao time para visualizar o relatório de status e fraquezas.
                 </div>
               ) : (
                 <>
-                  {/* Average Stats */}
-                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-xs font-black uppercase text-slate-300 flex items-center gap-1.5">
-                        <Activity className="w-4 h-4 text-emerald-400" />
-                        Média de Status do Time
+                  {/* Média de Status */}
+                  <div className="p-3 rounded-sm bg-[#1a3832] border-2 border-[#2c544a]">
+                    <div className="flex items-center justify-between mb-2 pb-1 border-b border-[#2c544a]">
+                      <h3 className="text-[10px] font-black uppercase text-white flex items-center gap-1.5">
+                        <Activity className="w-3.5 h-3.5 text-[#3888f8]" />
+                        Média de Status
                       </h3>
-                      <span className="font-mono text-xs font-extrabold text-white bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
-                        Total: {teamAnalysis.averageStats.total}
+                      <span className="font-mono text-[10px] font-black text-[#f8d030] bg-[#0c1c18] px-2 py-0.5 rounded-sm border border-[#203830]">
+                        BST: {teamAnalysis.averageStats.total}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="grid grid-cols-2 gap-1.5 text-[9px] font-black">
                       {[
                         { label: 'HP', val: teamAnalysis.averageStats.hp },
                         { label: 'Ataque', val: teamAnalysis.averageStats.attack },
@@ -378,29 +394,29 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
                         { label: 'Def. Esp.', val: teamAnalysis.averageStats.specialDefense },
                         { label: 'Velocidade', val: teamAnalysis.averageStats.speed },
                       ].map((s) => (
-                        <div key={s.label} className="p-2 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center">
-                          <span className="text-slate-400 font-semibold">{s.label}</span>
-                          <span className="font-mono font-bold text-white">{s.val}</span>
+                        <div key={s.label} className="p-1.5 rounded-sm bg-[#0c1c18] border border-[#203830] flex justify-between items-center">
+                          <span className="text-[#88b8a8]">{s.label}</span>
+                          <span className="font-mono text-white">{s.val}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Severe Weakness Warnings */}
-                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800">
-                    <h3 className="text-xs font-black uppercase text-slate-300 flex items-center gap-1.5 mb-2.5">
-                      <ShieldAlert className="w-4 h-4 text-rose-500" />
+                  {/* Fraquezas Críticas */}
+                  <div className="p-3 rounded-sm bg-[#1a3832] border-2 border-[#2c544a]">
+                    <h3 className="text-[10px] font-black uppercase text-white flex items-center gap-1.5 mb-2">
+                      <ShieldAlert className="w-3.5 h-3.5 text-[#d83828]" />
                       Fraquezas Críticas do Time
                     </h3>
 
                     {severeWeaknesses.length === 0 ? (
-                      <p className="text-xs text-emerald-400 font-medium flex items-center gap-1">
-                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      <p className="text-[10px] text-[#48b878] font-bold flex items-center gap-1">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#48b878]" />
                         Excelente equilíbrio! Nenhum tipo tem 3+ vantagens contra seu time.
                       </p>
                     ) : (
-                      <div className="space-y-1.5">
-                        <p className="text-[11px] text-slate-400 mb-2">
+                      <div className="space-y-1">
+                        <p className="text-[9px] text-[#88b8a8] mb-1">
                           Tipos com vantagem contra múltiplos membros:
                         </p>
                         {severeWeaknesses.map(([type, count]) => {
@@ -408,17 +424,17 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
                           return (
                             <div
                               key={type}
-                              className="p-2 rounded-xl bg-red-950/20 border border-red-500/30 flex items-center justify-between text-xs"
+                              className="p-1.5 rounded-sm bg-[#0c1c18] border border-[#d83828]/40 flex items-center justify-between text-[9px] font-black"
                             >
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1.5">
                                 <span
-                                  className="w-2.5 h-2.5 rounded-full"
+                                  className="w-2 h-2 rounded-full"
                                   style={{ backgroundColor: tc.color }}
                                 />
-                                <span className="font-bold text-white">{tc.name}</span>
+                                <span className="text-white">{tc.name}</span>
                               </div>
-                              <span className="text-rose-400 font-bold text-[11px]">
-                                {count} Pokémon vulneráveis
+                              <span className="text-[#e85848]">
+                                {count} vulneráveis
                               </span>
                             </div>
                           );
@@ -427,30 +443,27 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
                     )}
                   </div>
 
-                  {/* Strong Resistances */}
-                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800">
-                    <h3 className="text-xs font-black uppercase text-slate-300 flex items-center gap-1.5 mb-2.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                      Maiores Resistências do Time
+                  {/* Resistências */}
+                  <div className="p-3 rounded-sm bg-[#1a3832] border-2 border-[#2c544a]">
+                    <h3 className="text-[10px] font-black uppercase text-white flex items-center gap-1.5 mb-2">
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#48b878]" />
+                      Maiores Resistências
                     </h3>
 
                     {strongResistances.length === 0 ? (
-                      <p className="text-xs text-slate-500">
+                      <p className="text-[9px] text-[#689888]">
                         Nenhuma resistência concentrada acima de 3 membros.
                       </p>
                     ) : (
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1">
                         {strongResistances.map(([type, count]) => {
                           const tc = POKEMON_TYPES[type] || POKEMON_TYPES.normal;
                           return (
                             <span
                               key={type}
-                              className="px-2.5 py-1 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-1.5"
+                              style={{ backgroundColor: tc.color }}
+                              className="px-2 py-0.5 rounded-sm text-white text-[9px] font-black flex items-center gap-1 border border-black/30"
                             >
-                              <span
-                                className="w-2 h-2 rounded-full"
-                                style={{ backgroundColor: tc.color }}
-                              />
                               {tc.name} ({count}x)
                             </span>
                           );
@@ -464,17 +477,17 @@ export default function TeamBuilderDrawer({ isOpen, onClose, onSelectPokemonForD
           )}
         </div>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between">
-          <span className="text-xs text-slate-400">
-            {6 - team.length === 0 ? 'Equipe completa!' : `${6 - team.length} vaga(s) restante(s)`}
+        {/* Rodapé com Botão Retrô de Exportação */}
+        <div className="p-3 border-t-2 border-[#0e201c] bg-[#183630] flex items-center justify-between">
+          <span className="text-[10px] font-black text-[#a0d0c4]">
+            {6 - team.length === 0 ? 'TIME COMPLETO!' : `${6 - team.length} VAGA(S)`}
           </span>
           <button
             onClick={() => setShowExportModal(true)}
             disabled={team.length === 0}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition-all shadow-lg shadow-red-600/20 disabled:opacity-40"
+            className="px-3.5 py-2 rounded-sm text-[10px] font-black text-[#381c00] bg-[#f8d030] hover:bg-[#fedd50] border-2 border-[#987008] shadow-[0_3px_0_#684800] active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
           >
-            Exportar Time
+            <span>[START] EXPORTAR TIME</span>
           </button>
         </div>
 
