@@ -66,9 +66,9 @@ export default function App() {
 
           setPokemonList(enriched);
         } else {
-          // "Todas" (All 9 Generations)
+          // "Todas" (Gerações I a V - Até Unova: 649 Pokémon)
           const fullList = [];
-          for (let i = 1; i <= 1025; i++) {
+          for (let i = 1; i <= 649; i++) {
             fullList.push({
               id: i,
               name: `Pokemon #${i}`,
@@ -175,95 +175,125 @@ export default function App() {
         />
 
         {/* Main Container */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-4 sm:space-y-5">
           
-          {/* Banner com Informações do Campo de Batalha / Região (Estilo GBA) */}
-          <div className="relative rounded-sm overflow-hidden p-5 sm:p-7 border-2 border-[#38685c] bg-[#122824]/90 backdrop-blur-md shadow-[0_6px_25px_rgba(0,0,0,0.6)]">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-            
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          {/* Painel 1: Banner com Informações da Região (Estilo GBA Emerald / Frontier Pass) */}
+          <div
+            className="relative rounded-lg overflow-hidden p-4 sm:p-6 border-4 border-[#0c2420] bg-[#142e28] shadow-[0_8px_30px_rgba(0,0,0,0.7),inset_0_2px_0_#488878,inset_0_-2px_0_#0a1814]"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(to bottom, #183832 0px, #183832 3px, #122c26 3px, #122c26 6px)',
+            }}
+          >
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-[#183630] border border-[#38685c] text-[#a4e0d4] text-[10px] font-black mb-2.5">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-[#0c1c18] border border-[#20483e] text-[#a4e0d4] text-[9px] sm:text-[10px] font-black mb-2 shadow-inner">
                   <Swords className="w-3.5 h-3.5 text-[#38b878]" />
-                  <span>CAMPO DE BATALHA POKÉMON • GBA FIRE RED / EMERALD</span>
+                  <span>CAMPO DE BATALHA POKÉMON • GBA EMERALD & FIRE RED</span>
                 </div>
-                <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight uppercase">
+                <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight uppercase">
                   {activeGen ? (
                     <>
                       REGIÃO DE <span className="text-[#f8d030]">{activeGen.region}</span>
                     </>
                   ) : (
-                    'TODAS AS GERAÇÕES'
+                    'TODAS AS GERAÇÕES (I A V)'
                   )}
                 </h2>
-                <p className="text-[10px] sm:text-xs text-[#c8e8dc] mt-2 max-w-xl leading-relaxed font-bold">
+                <p className="text-[9px] sm:text-[11px] text-[#c8e8dc] mt-1.5 max-w-xl leading-relaxed font-bold">
                   {activeGen
                     ? `${activeGen.name.toUpperCase()} (${activeGen.games}) • POKÉMON #${String(activeGen.startId).padStart(3, '0')} A #${String(activeGen.endId).padStart(3, '0')}. Sprites 2D animados em movimento real. Clique no Pokémon para abrir o status GBA!`
-                    : 'Catálogo de Pokémon com sprites animados em pixel art 2D. Clique em qualquer card para abrir os status na Pokédex.'}
+                    : 'Catálogo oficial de Pokémon com sprites 2D animados em movimento real da 1ª à 5ª Geração (Kanto a Unova).'}
                 </p>
               </div>
 
-              {/* Quick stats badge estilo GBA */}
-              <div className="flex items-center gap-3">
-                <div className="p-3.5 rounded-sm bg-[#0c1c18] border-2 border-[#2c544a] text-center min-w-[100px] shadow-[0_3px_0_#06100e]">
-                  <span className="text-[9px] font-black text-[#48b878] uppercase tracking-wider block">
+              {/* Controles da Direita: Contador e o Botão Team Builder com o visual exato da imagem enviada */}
+              <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+                <div className="p-2 sm:p-2.5 rounded-sm bg-[#0a1814] border-2 border-[#20483e] text-center min-w-[85px] sm:min-w-[95px] shadow-inner">
+                  <span className="text-[8px] sm:text-[9px] font-black text-[#48b878] uppercase tracking-wider block">
                     NO CAMPO
                   </span>
-                  <span className="text-xl font-black text-white font-mono">
+                  <span className="text-base sm:text-xl font-black text-white font-mono">
                     {filteredPokemon.length}
                   </span>
                 </div>
 
-                <div
+                {/* BOTÃO TEAM BUILDER: Pílula Vermelha + Contador Oval Dourado estilo GBA (igual à imagem) */}
+                <button
                   onClick={() => setIsTeamDrawerOpen(true)}
-                  className="p-3.5 rounded-sm bg-[#1a3832] border-2 border-[#d83828] text-center min-w-[120px] cursor-pointer hover:bg-[#244840] shadow-[0_3px_0_#881810] active:translate-y-0.5 active:shadow-none transition-all group"
+                  title="Abrir Team Builder"
+                  className="relative inline-flex items-center gap-0 cursor-pointer active:scale-95 transition-all group select-none shrink-0"
                 >
-                  <span className="text-[9px] font-black text-[#f8d030] uppercase tracking-wider block group-hover:text-amber-300">
-                    [START] SEU TIME
+                  {/* Contador Oval Escuro com borda dourada — fica sobreposto à esquerda da pílula */}
+                  <span
+                    className="relative z-10 flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#101828] border-[3px] border-[#f8c820] shadow-[0_0_6px_#f8c820aa] mr-[-10px]"
+                  >
+                    <span className="text-[#f8d030] font-black text-[9px] sm:text-[10px] leading-none tracking-tight">
+                      {team.length}/6
+                    </span>
+                    <span className="mt-0.5 text-[7px] leading-none" title="Pokéball">🔴</span>
                   </span>
-                  <span className="text-xl font-black text-white font-mono flex items-center justify-center gap-1">
-                    {team.length}<span className="text-[#a0c0b8] text-xs">/6</span>
+
+                  {/* Pílula principal vermelha */}
+                  <span
+                    className="inline-flex items-center pl-5 pr-4 py-2 sm:py-2.5 rounded-full font-black text-white text-[10px] sm:text-xs tracking-wide drop-shadow-sm"
+                    style={{
+                      background: 'linear-gradient(to bottom, #f04858 0%, #c82030 60%, #a81828 100%)',
+                      boxShadow: '0 3px 0 #781018, inset 0 1px 0 rgba(255,255,255,0.3)',
+                      border: '2px solid rgba(255,255,255,0.35)',
+                    }}
+                  >
+                    Team Builder
                   </span>
-                </div>
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Abas de Gerações */}
-          <section className="bg-[#122824]/85 backdrop-blur-md rounded-2xl p-4 border border-[#d8e4c8]/20 shadow-xl">
+          {/* Painel 2: Abas de Gerações (Estilo Painel GBA) */}
+          <section
+            className="rounded-lg p-3 sm:p-4 border-4 border-[#0c2420] bg-[#142e28] shadow-[0_6px_25px_rgba(0,0,0,0.6)]"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(to bottom, #183832 0px, #183832 3px, #122c26 3px, #122c26 6px)',
+            }}
+          >
             <GenerationTabs
               selectedGenId={selectedGenId}
               onSelectGen={setSelectedGenId}
             />
           </section>
 
-          {/* Filtros por Tipo e Ordenação */}
-          <section className="bg-[#122824]/85 backdrop-blur-md rounded-2xl p-4 border border-[#d8e4c8]/20 shadow-xl space-y-4">
+          {/* Painel 3: Filtros por Tipo e Ordenação (Estilo Painel GBA) */}
+          <section
+            className="rounded-lg p-3 sm:p-4 border-4 border-[#0c2420] bg-[#142e28] shadow-[0_6px_25px_rgba(0,0,0,0.6)] space-y-3"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(to bottom, #183832 0px, #183832 3px, #122c26 3px, #122c26 6px)',
+            }}
+          >
             <TypeFilters
               selectedType={selectedType}
               onSelectType={setSelectedType}
             />
 
-            {/* Barra de Ordenação */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-700/60 text-xs">
-              <span className="text-slate-300 font-semibold">
-                Mostrando <strong className="text-emerald-400">{visiblePokemon.length}</strong> de <strong className="text-white">{filteredPokemon.length}</strong> Pokémon
+            {/* Barra de Ordenação Retrô GBA */}
+            <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 pt-2.5 border-t-2 border-[#20483e] text-[9px] sm:text-[10px] font-black">
+              <span className="text-[#a0d0c4]">
+                MOSTRANDO <strong className="text-[#f8d030]">{visiblePokemon.length}</strong> DE <strong className="text-white">{filteredPokemon.length}</strong> POKÉMON
               </span>
 
-              <div className="flex items-center gap-2">
-                <span className="text-slate-300 flex items-center gap-1 font-bold">
-                  <ArrowUpDown className="w-3.5 h-3.5 text-emerald-400" />
-                  Ordenar:
+              <div className="flex items-center gap-1.5">
+                <span className="text-[#a0d0c4] flex items-center gap-1">
+                  <ArrowUpDown className="w-3 h-3 text-[#f8d030]" />
+                  ORDENAR:
                 </span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-[#0c1b18] border border-emerald-500/40 rounded-lg px-2.5 py-1.5 text-xs text-white font-bold focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                  className="bg-[#0c1c18] border-2 border-[#20483e] rounded-sm px-2 py-1 text-[9px] sm:text-[10px] text-white font-black focus:outline-none focus:border-[#f8d030] cursor-pointer"
                 >
-                  <option value="id_asc">Número (Crescente)</option>
-                  <option value="id_desc">Número (Decrescente)</option>
-                  <option value="name_asc">Nome (A - Z)</option>
-                  <option value="name_desc">Nome (Z - A)</option>
+                  <option value="id_asc">NÚMERO (CRESCENTE)</option>
+                  <option value="id_desc">NÚMERO (DECRESCENTE)</option>
+                  <option value="name_asc">NOME (A - Z)</option>
+                  <option value="name_desc">NOME (Z - A)</option>
                 </select>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Sparkles, X, Users } from 'lucide-react';
+import { Search, Sparkles, X } from 'lucide-react';
 
 export default function Header({
   searchTerm,
@@ -48,7 +48,7 @@ export default function Header({
               </span>
             </div>
             <p className="text-[8px] sm:text-[9px] font-bold text-[#fce8d8] tracking-widest hidden md:block">
-              {totalPokemonCount} POKÉMON
+              {totalPokemonCount} POKÉMON (ERA 2D)
             </p>
           </div>
         </div>
@@ -85,19 +85,18 @@ export default function Header({
             </div>
           </div>
 
-          {/* Botões Retrô com Rótulos de Controle GBA ([SELECT] e [START]) */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Botões Retrô: [SELECT] SHINY e o Botão Team Builder idêntico à imagem de referência */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Botão [SELECT] SHINY */}
             <button
               onClick={onToggleShiny}
               title={shinyMode ? 'Modo Shiny Ativo' : 'Ver Formas Shiny'}
-              className={`px-2 sm:px-3 py-1.5 rounded-sm border-2 text-[9px] sm:text-[10px] font-black flex items-center gap-1.5 cursor-pointer transition-all shadow-[0_2px_0_#0a1838] active:translate-y-0.5 active:shadow-none ${
+              className={`px-2 sm:px-2.5 py-1.5 rounded-sm border-2 text-[9px] sm:text-[10px] font-black flex items-center gap-1.5 cursor-pointer transition-all shadow-[0_2px_0_#0a1838] active:translate-y-0.5 active:shadow-none ${
                 shinyMode
                   ? 'bg-[#f8d030] text-[#382000] border-[#987008] shadow-[0_2px_0_#583800]'
                   : 'bg-[#eef2fc] hover:bg-white text-[#183478] border-[#0e2868]'
               }`}
             >
-              {/* Badge [SELECT] Estilo GBA */}
               <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-full bg-[#183478] text-white text-[8px] font-black border border-black/20">
                 SELECT
               </span>
@@ -105,41 +104,34 @@ export default function Header({
               <span className="tracking-wide">SHINY</span>
             </button>
 
-            {/* Botão [START] EQUIPE / TEAM BUILDER */}
+            {/* BOTÃO TEAM BUILDER: Pílula Vermelha + Contador Oval Dourado estilo GBA (igual à imagem) */}
             <button
               onClick={onOpenTeamDrawer}
               title="Abrir Team Builder"
-              className="relative px-2 sm:px-3 py-1.5 bg-[#f0f4fc] hover:bg-white text-[#102458] border-2 border-[#0e2868] rounded-sm text-[9px] sm:text-[10px] font-black flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-[0_2px_0_#0a1838] active:translate-y-0.5 active:shadow-none transition-all group"
+              className="relative inline-flex items-center gap-0 cursor-pointer active:scale-95 transition-all group select-none"
             >
-              {/* Badge [START] Estilo GBA */}
-              <span className="px-1.5 py-0.2 rounded-full bg-[#d83828] text-white text-[8px] font-black border border-[#781810]">
-                START
+              {/* Contador Oval Escuro com borda dourada — fica sobreposto à esquerda da pílula */}
+              <span
+                className="relative z-10 flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#101828] border-[3px] border-[#f8c820] shadow-[0_0_6px_#f8c820aa] mr-[-10px]"
+              >
+                <span className="text-[#f8d030] font-black text-[9px] sm:text-[10px] leading-none tracking-tight">
+                  {teamCount}/6
+                </span>
+                {/* Mini Pokéball abaixo do contador — detalhe fiel à imagem */}
+                <span className="mt-0.5 text-[7px] leading-none" title="Pokéball">🔴</span>
               </span>
 
-              <div className="flex items-center gap-1">
-                <Users className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#2050b8]" />
-                <span className="tracking-wide hidden sm:inline">EQUIPE</span>
-              </div>
-
-              {/* Indicador de Quantidade X/6 */}
-              <span className="px-1.5 py-0.2 rounded-sm bg-[#183478] text-[#f8d030] text-[9px] font-black font-mono border border-black/30">
-                {teamCount}/6
+              {/* Pílula principal vermelha */}
+              <span
+                className="inline-flex items-center pl-5 pr-4 py-2 sm:py-2.5 rounded-full font-black text-white text-[10px] sm:text-xs tracking-wide drop-shadow-sm"
+                style={{
+                  background: 'linear-gradient(to bottom, #f04858 0%, #c82030 60%, #a81828 100%)',
+                  boxShadow: '0 3px 0 #781018, inset 0 1px 0 rgba(255,255,255,0.3)',
+                  border: '2px solid rgba(255,255,255,0.35)',
+                }}
+              >
+                Team Builder
               </span>
-
-              {/* Prévia de mini-sprites da equipe */}
-              {teamMembers && teamMembers.length > 0 && (
-                <div className="hidden lg:flex -space-x-1.5 items-center ml-0.5">
-                  {teamMembers.slice(0, 3).map((m, i) => (
-                    <img
-                      key={i}
-                      src={m.sprite}
-                      alt={m.name}
-                      style={{ imageRendering: 'pixelated' }}
-                      className="w-4 h-4 rounded-full bg-white border border-[#183478] object-contain"
-                    />
-                  ))}
-                </div>
-              )}
             </button>
           </div>
         </div>
